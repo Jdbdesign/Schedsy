@@ -1172,6 +1172,270 @@
     .page-view.active { display: block; }
 
     /* ════════════════════════════════
+       CALENDAR PAGE
+    ════════════════════════════════ */
+    #page-calendar { height: calc(100vh - var(--topbar-h)); overflow-y: auto; padding: var(--space-6) var(--space-8); }
+    .cal-wrapper { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-5); }
+
+    .cal-filter-strip { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+    .cal-filter-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 12px;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 12px; font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer; background: var(--color-bg-surface);
+      transition: all var(--duration-fast);
+    }
+    .cal-filter-chip:hover { border-color: var(--color-border-strong); color: var(--color-text-primary); }
+    .cal-filter-chip.active { background: var(--color-accent-primary-light); border-color: var(--color-accent-primary); color: var(--color-accent-primary); }
+    .cal-filter-chip.google-active { background: #EFF4FF; border-color: #2563EB; color: #2563EB; }
+    .cal-filter-chip .filter-dot { width: 8px; height: 8px; border-radius: var(--radius-full); flex-shrink: 0; }
+
+    .cal-header { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+    .cal-header-left { display: flex; align-items: center; gap: var(--space-2); flex: 1; min-width: 0; }
+    .cal-period-label {
+      font-family: var(--font-display);
+      font-size: 19px; font-weight: 600;
+      color: var(--color-text-primary); letter-spacing: -0.025em;
+      min-width: 160px; margin-left: var(--space-2);
+    }
+    .cal-nav-btn {
+      width: 34px; height: 34px;
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .cal-nav-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .cal-nav-btn svg { width: 14px; height: 14px; stroke-width: 2; }
+    .cal-today-btn {
+      padding: 7px 14px;
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      color: var(--color-text-secondary); cursor: pointer;
+      transition: background var(--duration-fast), color var(--duration-fast); white-space: nowrap;
+    }
+    .cal-today-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .cal-view-switcher {
+      display: flex; gap: 2px;
+      background: var(--color-bg-subtle); border: 1px solid var(--color-border);
+      border-radius: var(--radius-full); padding: 3px;
+    }
+    .cal-view-tab {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      font-size: 13px; font-weight: 500; color: var(--color-text-secondary);
+      cursor: pointer; border: none; background: transparent;
+      transition: all var(--duration-fast) var(--ease-out); white-space: nowrap;
+    }
+    .cal-view-tab:hover { color: var(--color-text-primary); }
+    .cal-view-tab.active { background: var(--color-bg-surface); color: var(--color-text-primary); box-shadow: var(--shadow-xs); font-weight: 600; }
+    .cal-sync-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 16px;
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      color: var(--color-text-secondary); cursor: pointer;
+      transition: all var(--duration-fast); white-space: nowrap;
+    }
+    .cal-sync-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); border-color: var(--color-border-strong); }
+    .cal-sync-btn.synced { background: var(--color-accent-primary-light); border-color: var(--color-accent-primary); color: var(--color-accent-primary); }
+    .cal-sync-btn svg { width: 15px; height: 15px; stroke-width: 1.5; }
+
+    /* ── Body layout ── */
+    .cal-body { display: flex; gap: var(--space-5); align-items: flex-start; }
+    .cal-main {
+      flex: 1; min-width: 0;
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+
+    /* ── View system ── */
+    .cal-view { display: none; }
+    .cal-view.active { display: block; }
+
+    /* ── Month View ── */
+    .cal-day-headers {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .cal-day-hdr {
+      padding: var(--space-3); text-align: center;
+      font-size: 11.5px; font-weight: 600; color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .cal-month-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-day-cell {
+      min-height: 104px; padding: var(--space-2);
+      border-right: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer; transition: background var(--duration-fast);
+    }
+    .cal-day-cell:hover { background: var(--color-bg-subtle); }
+    .cal-day-cell:nth-child(7n) { border-right: none; }
+    .cal-day-cell.other-month { background: var(--color-bg-base); }
+    .cal-day-cell.other-month .cal-day-num { color: var(--color-text-tertiary); opacity: 0.45; }
+    .cal-day-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: var(--radius-full);
+      font-size: 13px; font-weight: 500; color: var(--color-text-secondary);
+      margin-bottom: var(--space-1);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .cal-day-num.today { background: var(--color-accent-primary); color: white; font-weight: 700; }
+    .cal-day-cell:hover .cal-day-num:not(.today) { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .cal-event-chip {
+      display: flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 500;
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer; max-width: 100%;
+      transition: opacity var(--duration-fast);
+    }
+    .cal-event-chip:hover { opacity: 0.8; }
+    .cal-event-chip .chip-dot { width: 6px; height: 6px; min-width: 6px; border-radius: var(--radius-full); flex-shrink: 0; }
+    .cal-event-chip.source-google { background: #EFF4FF; color: #2563EB; }
+    .cal-event-chip.source-google .chip-dot { background: #2563EB; }
+    .cal-more-chip { font-size: 11px; color: var(--color-text-tertiary); padding: 2px 7px; cursor: pointer; font-weight: 500; }
+    .cal-more-chip:hover { color: var(--color-accent-primary); }
+
+    /* ── Week View ── */
+    .cal-week-view-inner { overflow-y: auto; max-height: 600px; scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+    .cal-week-header-row {
+      display: grid; grid-template-columns: 56px repeat(7, 1fr);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky; top: 0; background: var(--color-bg-surface); z-index: 2;
+    }
+    .cal-week-time-spacer { border-right: 1px solid var(--color-border); }
+    .cal-week-day-hdr {
+      padding: var(--space-3) var(--space-2); text-align: center;
+      border-right: 1px solid var(--color-border);
+    }
+    .cal-week-day-hdr:last-child { border-right: none; }
+    .cal-week-day-name { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); }
+    .cal-week-day-date { font-size: 18px; font-weight: 600; color: var(--color-text-secondary); font-family: var(--font-display); letter-spacing: -0.02em; margin-top: 2px; }
+    .cal-week-day-hdr.today .cal-week-day-date { color: var(--color-accent-primary); }
+    .cal-week-day-hdr.today .cal-week-day-name { color: var(--color-accent-primary); }
+    .cal-week-body { display: grid; grid-template-columns: 56px repeat(7, 1fr); }
+    .cal-week-time-col { border-right: 1px solid var(--color-border); }
+    .cal-time-label {
+      height: 48px; display: flex; align-items: flex-start; justify-content: flex-end;
+      padding: 0 var(--space-2); padding-top: 6px;
+      font-size: 10.5px; font-weight: 500; color: var(--color-text-tertiary);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .cal-week-col { position: relative; border-right: 1px solid var(--color-border); }
+    .cal-week-col:last-child { border-right: none; }
+    .cal-week-col.today-col { background: rgba(45,106,79,0.025); }
+    .cal-week-slot { height: 48px; border-bottom: 1px dashed var(--color-border); }
+    .cal-week-slot:last-child { border-bottom: none; }
+    .cal-week-event {
+      position: absolute; left: 2px; right: 2px;
+      border-radius: var(--radius-sm); padding: 3px 6px;
+      font-size: 11px; font-weight: 600; color: white;
+      overflow: hidden; cursor: pointer; z-index: 1;
+      transition: opacity var(--duration-fast), transform var(--duration-fast);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .cal-week-event:hover { opacity: 0.88; transform: scale(1.015); }
+    .cal-week-event-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-week-event-time { font-size: 10px; opacity: 0.85; font-weight: 500; }
+
+    /* ── Day View ── */
+    .cal-day-header-bar {
+      padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-subtle); display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-day-header-date { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.015em; }
+    .cal-day-header-count { font-size: 12px; color: var(--color-text-secondary); }
+    .cal-day-view-inner { overflow-y: auto; max-height: 560px; scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+    .cal-day-body { display: grid; grid-template-columns: 56px 1fr; }
+    .cal-day-col { position: relative; }
+    .cal-day-slot { height: 48px; border-bottom: 1px dashed var(--color-border); }
+    .cal-day-event {
+      position: absolute; left: var(--space-2); right: var(--space-2);
+      border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
+      font-size: 12px; font-weight: 600; color: white;
+      overflow: hidden; cursor: pointer; z-index: 1;
+      transition: opacity var(--duration-fast);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .cal-day-event:hover { opacity: 0.87; }
+    .cal-day-event-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-day-event-guest { font-size: 11px; opacity: 0.85; font-weight: 400; margin-top: 1px; }
+    .cal-day-event-meta { font-size: 10px; opacity: 0.8; margin-top: 2px; }
+
+    /* ── Sidebar ── */
+    .cal-sidebar { width: 280px; min-width: 280px; display: flex; flex-direction: column; gap: var(--space-4); }
+    .cal-upcoming-card {
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .cal-upcoming-header {
+      padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-upcoming-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.01em; }
+    .cal-upcoming-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 20px; height: 20px; padding: 0 6px;
+      background: var(--color-accent-primary-light); color: var(--color-accent-primary);
+      border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
+    }
+    .cal-upcoming-list { padding: var(--space-2); display: flex; flex-direction: column; max-height: 340px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+    .cal-upcoming-item {
+      display: flex; align-items: flex-start; gap: var(--space-2);
+      padding: var(--space-3); border-radius: var(--radius-md);
+      cursor: pointer; transition: background var(--duration-fast);
+    }
+    .cal-upcoming-item:hover { background: var(--color-bg-subtle); }
+    .cal-upcoming-color { width: 3px; min-width: 3px; height: 38px; border-radius: var(--radius-full); flex-shrink: 0; margin-top: 3px; }
+    .cal-upcoming-info { flex: 1; min-width: 0; }
+    .cal-upcoming-ev { font-size: 12.5px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-upcoming-guest { font-size: 11.5px; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+    .cal-upcoming-time { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; display: flex; align-items: center; gap: 3px; }
+    .cal-upcoming-time svg { width: 11px; height: 11px; }
+    .cal-upcoming-badge {
+      font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: var(--radius-full);
+      align-self: flex-start; margin-top: 4px; white-space: nowrap;
+    }
+    .cal-upcoming-badge.schedsy { background: var(--color-accent-primary-light); color: var(--color-accent-primary); }
+    .cal-upcoming-badge.google { background: #EFF4FF; color: #2563EB; }
+    .cal-empty-upcoming { padding: var(--space-8) var(--space-4); text-align: center; }
+    .cal-empty-upcoming-icon { width: 44px; height: 44px; background: var(--color-bg-subtle); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-3); color: var(--color-text-tertiary); }
+    .cal-empty-upcoming-icon svg { width: 20px; height: 20px; stroke-width: 1.5; }
+    .cal-empty-upcoming-text { font-size: 13px; color: var(--color-text-secondary); }
+    .cal-empty-upcoming-sub { font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+    /* ── Sync card ── */
+    .cal-sync-card {
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: var(--space-5);
+    }
+    .cal-sync-card-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px; letter-spacing: -0.01em; }
+    .cal-sync-card-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-4); }
+    .cal-sync-services { display: flex; flex-direction: column; gap: var(--space-2); }
+    .cal-sync-service {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: 10px var(--space-4);
+      border: 1.5px solid var(--color-border); border-radius: var(--radius-md);
+      cursor: pointer; transition: all var(--duration-fast) var(--ease-out);
+    }
+    .cal-sync-service:hover { border-color: var(--color-accent-primary); background: var(--color-accent-primary-light); }
+    .cal-sync-service.connected { border-color: var(--color-accent-success); background: #F0FDF4; }
+    .cal-sync-service-icon { width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cal-sync-service-info { flex: 1; min-width: 0; }
+    .cal-sync-service-name { font-size: 13px; font-weight: 600; color: var(--color-text-primary); }
+    .cal-sync-service-status { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+    .cal-sync-service.connected .cal-sync-service-status { color: var(--color-accent-success); }
+    .cal-sync-action { font-size: 12px; font-weight: 600; color: var(--color-accent-primary); white-space: nowrap; }
+    .cal-sync-service.connected .cal-sync-action { color: var(--color-accent-success); }
+
+    /* ════════════════════════════════
        EVENT TYPES PAGE
     ════════════════════════════════ */
     .etp-wrapper { max-width: 900px; margin: 0 auto; }
@@ -2511,6 +2775,147 @@
         </div>
       </div><!-- /page-event-types -->
 
+      <!-- ══ CALENDAR PAGE ══ -->
+      <div class="page-view" id="page-calendar">
+        <div class="cal-wrapper">
+
+          <!-- Source filter strip -->
+          <div class="cal-filter-strip">
+            <button class="cal-filter-chip active" data-source="schedsy" type="button">
+              <span class="filter-dot" style="background:var(--color-accent-primary)"></span>
+              Schedsy
+            </button>
+            <button class="cal-filter-chip" data-source="google" id="cal-google-filter" type="button">
+              <span class="filter-dot" style="background:#2563EB"></span>
+              Google Calendar
+              <span id="cal-google-badge" style="display:none;font-size:10px;background:#EFF4FF;color:#2563EB;border-radius:4px;padding:1px 5px;margin-left:2px">Synced</span>
+            </button>
+          </div>
+
+          <!-- Calendar header -->
+          <div class="cal-header">
+            <div class="cal-header-left">
+              <button class="cal-nav-btn" id="cal-prev-btn" type="button" aria-label="Previous">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="cal-nav-btn" id="cal-next-btn" type="button" aria-label="Next">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button class="cal-today-btn" id="cal-today-btn" type="button">Today</button>
+              <span class="cal-period-label" id="cal-period-label">June 2026</span>
+            </div>
+
+            <!-- View switcher -->
+            <div class="cal-view-switcher" role="tablist">
+              <button class="cal-view-tab active" data-view="month" role="tab" type="button">Month</button>
+              <button class="cal-view-tab" data-view="week" role="tab" type="button">Week</button>
+              <button class="cal-view-tab" data-view="day" role="tab" type="button">Day</button>
+            </div>
+
+            <!-- Connect calendar -->
+            <button class="cal-sync-btn" id="cal-sync-btn" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              Connect Calendar
+            </button>
+          </div>
+
+          <!-- Main body: calendar + sidebar -->
+          <div class="cal-body">
+
+            <!-- Calendar grid -->
+            <div class="cal-main">
+
+              <!-- Month view -->
+              <div class="cal-view active" id="cal-view-month">
+                <div class="cal-day-headers">
+                  <div class="cal-day-hdr">Sun</div>
+                  <div class="cal-day-hdr">Mon</div>
+                  <div class="cal-day-hdr">Tue</div>
+                  <div class="cal-day-hdr">Wed</div>
+                  <div class="cal-day-hdr">Thu</div>
+                  <div class="cal-day-hdr">Fri</div>
+                  <div class="cal-day-hdr">Sat</div>
+                </div>
+                <div class="cal-month-grid" id="cal-month-grid"></div>
+              </div>
+
+              <!-- Week view -->
+              <div class="cal-view" id="cal-view-week">
+                <div class="cal-week-view-inner">
+                  <div class="cal-week-header-row" id="cal-week-header"></div>
+                  <div class="cal-week-body" id="cal-week-body"></div>
+                </div>
+              </div>
+
+              <!-- Day view -->
+              <div class="cal-view" id="cal-view-day">
+                <div class="cal-day-header-bar">
+                  <span class="cal-day-header-date" id="cal-day-header-date"></span>
+                  <span class="cal-day-header-count" id="cal-day-header-count"></span>
+                </div>
+                <div class="cal-day-view-inner">
+                  <div class="cal-day-body" id="cal-day-body"></div>
+                </div>
+              </div>
+
+            </div><!-- /cal-main -->
+
+            <!-- Sidebar -->
+            <div class="cal-sidebar">
+
+              <!-- Upcoming bookings -->
+              <div class="cal-upcoming-card">
+                <div class="cal-upcoming-header">
+                  <span class="cal-upcoming-title">Upcoming</span>
+                  <span class="cal-upcoming-count" id="cal-upcoming-count">0</span>
+                </div>
+                <div class="cal-upcoming-list" id="cal-upcoming-list"></div>
+              </div>
+
+              <!-- Calendar integrations -->
+              <div class="cal-sync-card">
+                <div class="cal-sync-card-title">Calendar Integrations</div>
+                <div class="cal-sync-card-desc">Sync your other calendars to see everything in one place. Only Schedsy bookings appear until you connect.</div>
+                <div class="cal-sync-services">
+                  <div class="cal-sync-service" id="sync-google" data-service="google">
+                    <div class="cal-sync-service-icon" style="background:#E8F0FE;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21.8 11.2c0-.7-.1-1.4-.2-2H12v3.8h5.5c-.2 1.2-1 2.2-2 2.9v2.4h3.3c1.9-1.8 3-4.4 3-7.1z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.6C4.8 19.9 8.1 22 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3C2.4 8.6 2 10.2 2 12s.4 3.4 1 4.6l3.4-2.6z" fill="#FBBC04"/><path d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9C16.9 2.9 14.7 2 12 2 8.1 2 4.8 4.1 3 7.4l3.4 2.6C7.2 7.7 9.4 5.9 12 5.9z" fill="#EA4335"/></svg>
+                    </div>
+                    <div class="cal-sync-service-info">
+                      <div class="cal-sync-service-name">Google Calendar</div>
+                      <div class="cal-sync-service-status" id="google-status">Not connected</div>
+                    </div>
+                    <span class="cal-sync-action" id="google-action">Connect</span>
+                  </div>
+                  <div class="cal-sync-service" id="sync-outlook" data-service="outlook">
+                    <div class="cal-sync-service-icon" style="background:#EEF2FF;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="9" height="9" rx="1.5" fill="#0078D4"/><rect x="13" y="2" width="9" height="9" rx="1.5" fill="#0078D4" opacity="0.7"/><rect x="2" y="13" width="9" height="9" rx="1.5" fill="#0078D4" opacity="0.7"/><rect x="13" y="13" width="9" height="9" rx="1.5" fill="#0078D4" opacity="0.45"/></svg>
+                    </div>
+                    <div class="cal-sync-service-info">
+                      <div class="cal-sync-service-name">Outlook Calendar</div>
+                      <div class="cal-sync-service-status" id="outlook-status">Not connected</div>
+                    </div>
+                    <span class="cal-sync-action" id="outlook-action">Connect</span>
+                  </div>
+                  <div class="cal-sync-service" id="sync-apple" data-service="apple">
+                    <div class="cal-sync-service-icon" style="background:#F5F5F5;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17.6 12.8c0-2.7 2.2-4 2.3-4.1-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.3 1-4.2 1s-2.2-1-3.6-1c-1.9 0-3.6 1.1-4.6 2.8-2 3.4-.5 8.4 1.4 11.1.9 1.3 2 2.8 3.5 2.8 1.4-.1 1.9-.9 3.6-.9 1.7 0 2.1.9 3.6.9 1.5 0 2.5-1.3 3.4-2.6.7-1 1.3-2.2 1.6-3.4C20 16.4 17.6 15.1 17.6 12.8z" fill="#555"/><path d="M14.5 5.3c.8-1 1.3-2.3 1.1-3.6-1.1.1-2.4.7-3.2 1.7-.7.8-1.3 2.2-1.1 3.4 1.2.1 2.4-.5 3.2-1.5z" fill="#555"/></svg>
+                    </div>
+                    <div class="cal-sync-service-info">
+                      <div class="cal-sync-service-name">Apple Calendar</div>
+                      <div class="cal-sync-service-status" id="apple-status">Not connected</div>
+                    </div>
+                    <span class="cal-sync-action" id="apple-action">Connect</span>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /cal-sidebar -->
+
+          </div><!-- /cal-body -->
+        </div><!-- /cal-wrapper -->
+      </div><!-- /page-calendar -->
+
     </main>
   </div>
 </div>
@@ -3250,6 +3655,10 @@
           if (window.lucide) lucide.createIcons();
         } else if (page === 'home') {
           switchPage('home');
+        } else if (page === 'calendar') {
+          switchPage('calendar');
+          initCalendarPage();
+          if (window.lucide) lucide.createIcons();
         } else {
           switchPage('home');
           document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
@@ -3366,6 +3775,10 @@
       if (window.lucide) lucide.createIcons();
     } else if (page === 'home') {
       switchPage('home');
+    } else if (page === 'calendar') {
+      switchPage('calendar');
+      initCalendarPage();
+      if (window.lucide) lucide.createIcons();
     } else {
       switchPage('home');
       document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
@@ -4624,6 +5037,434 @@
       closeEditModal();
       setTimeout(() => openBookMeetingModal(ev), 120);
     });
+  }
+
+  /* ══════════════════════════════════
+     CALENDAR PAGE
+  ══════════════════════════════════ */
+
+  const calState = {
+    view: 'month',
+    year: 2026, month: 5,
+    weekStart: null,
+    dayDate: null,
+    synced: { google: false, outlook: false, apple: false },
+    googleFilterOn: false,
+    _init: false,
+  };
+
+  const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const CAL_DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const CAL_DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const TODAY = new Date(2026, 5, 6);
+
+  const DEMO_BOOKINGS = [
+    { id:'d1',  name:'Quick Intro Call',   guest:'Sarah Chen',    time:'10:00', dur:30,  color:'#2D6A4F', src:'schedsy', off:1  },
+    { id:'d2',  name:'Product Demo',        guest:'Marcus Webb',   time:'14:00', dur:60,  color:'#C4702A', src:'schedsy', off:3  },
+    { id:'d3',  name:'Strategy Session',    guest:'Priya Nair',    time:'11:00', dur:60,  color:'#7C3AED', src:'schedsy', off:7  },
+    { id:'d4',  name:'Design Review',       guest:'Jordan Kim',    time:'15:30', dur:45,  color:'#DB2777', src:'schedsy', off:10 },
+    { id:'d5',  name:'Client Onboarding',   guest:'Emma Santos',   time:'13:00', dur:60,  color:'#0891B2', src:'schedsy', off:2  },
+    { id:'d6',  name:'Weekly Sync',         guest:'Chris Park',    time:'16:00', dur:30,  color:'#059669', src:'schedsy', off:8  },
+    { id:'d7',  name:'Quick Intro Call',    guest:'Tyler Brooks',  time:'10:00', dur:30,  color:'#2D6A4F', src:'schedsy', off:14 },
+    { id:'d8',  name:'Team Standup',        guest:'Alex Rivera',   time:'09:00', dur:30,  color:'#2563EB', src:'schedsy', off:5  },
+  ];
+  const GOOGLE_DEMO = [
+    { id:'g1', name:'Lunch with Team',       guest:'', time:'12:00', dur:60,  color:'#1A73E8', src:'google', off:4  },
+    { id:'g2', name:'Doctor Appointment',    guest:'', time:'09:30', dur:30,  color:'#1A73E8', src:'google', off:9  },
+    { id:'g3', name:'Gym Session',           guest:'', time:'07:00', dur:60,  color:'#1A73E8', src:'google', off:2  },
+    { id:'g4', name:'Birthday Party',        guest:'', time:'18:00', dur:120, color:'#E67C73', src:'google', off:17 },
+  ];
+
+  function calGetBookings() {
+    const list = [];
+    /* Real bookings from localStorage */
+    getEvents().forEach(ev => {
+      if (ev.hasBooking && ev.booking) {
+        const d = new Date(ev.booking.dateStr);
+        if (!isNaN(d)) {
+          const [h, m] = calParseTime(ev.booking.time);
+          list.push({ id:'bk_'+ev.id, name:ev.name, guest:ev.booking.name||'', date:d,
+                      time:`${pad(h)}:${pad(m)}`, dur:parseInt(ev.duration)||30, color:ev.color||'#2D6A4F', src:'schedsy' });
+        }
+      }
+    });
+    /* Demo Schedsy bookings */
+    DEMO_BOOKINGS.forEach(b => {
+      const d = new Date(TODAY); d.setDate(d.getDate() + b.off);
+      list.push({ ...b, date: d });
+    });
+    /* Google demo bookings if connected */
+    if (calState.synced.google) {
+      GOOGLE_DEMO.forEach(b => {
+        const d = new Date(TODAY); d.setDate(d.getDate() + b.off);
+        list.push({ ...b, date: d });
+      });
+    }
+    return list;
+  }
+
+  function calParseTime(str) {
+    if (!str) return [9,0];
+    const m = str.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return [9,0];
+    let h = parseInt(m[1]), min = parseInt(m[2]);
+    if (m[3].toUpperCase()==='PM' && h!==12) h+=12;
+    if (m[3].toUpperCase()==='AM' && h===12) h=0;
+    return [h, min];
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  function calFmt(t) {
+    if (!t) return '';
+    const [h,m] = t.split(':').map(Number);
+    return `${h%12||12}:${pad(m)} ${h>=12?'PM':'AM'}`;
+  }
+
+  function calDk(d) { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+  function calSameDay(a,b) {
+    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  }
+
+  function hexRgba(hex, a) {
+    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return r ? `rgba(${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)},${a})` : `rgba(45,106,79,${a})`;
+  }
+
+  function calUpdateLabel() {
+    const el = document.getElementById('cal-period-label');
+    if (!el) return;
+    const { view, year, month, weekStart, dayDate } = calState;
+    if (view === 'month') {
+      el.textContent = `${CAL_MONTHS[month]} ${year}`;
+    } else if (view === 'week') {
+      const we = new Date(weekStart); we.setDate(we.getDate()+6);
+      el.textContent = weekStart.getMonth()===we.getMonth()
+        ? `${CAL_MONTHS[weekStart.getMonth()]} ${weekStart.getDate()}–${we.getDate()}, ${weekStart.getFullYear()}`
+        : `${CAL_MONTHS[weekStart.getMonth()]} ${weekStart.getDate()} – ${CAL_MONTHS[we.getMonth()]} ${we.getDate()}, ${weekStart.getFullYear()}`;
+    } else {
+      el.textContent = `${CAL_DAYS_FULL[dayDate.getDay()]}, ${CAL_MONTHS[dayDate.getMonth()]} ${dayDate.getDate()}, ${dayDate.getFullYear()}`;
+    }
+  }
+
+  function calRenderMonth() {
+    const grid = document.getElementById('cal-month-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const { year, month } = calState;
+    const bookings = calGetBookings();
+    const byDay = {};
+    bookings.forEach(b => { const k=calDk(b.date); (byDay[k]||(byDay[k]=[])).push(b); });
+
+    const firstDow = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+
+    for (let i = 0; i < 42; i++) {
+      let d, other = false;
+      if (i < firstDow) { d = new Date(year, month-1, prevDays - firstDow + i + 1); other = true; }
+      else if (i - firstDow < daysInMonth) { d = new Date(year, month, i - firstDow + 1); }
+      else { d = new Date(year, month+1, i - firstDow - daysInMonth + 1); other = true; }
+
+      const isToday = calSameDay(d, TODAY);
+      const k = calDk(d);
+      const dayBks = byDay[k] || [];
+
+      const cell = document.createElement('div');
+      cell.className = `cal-day-cell${other?' other-month':''}`;
+      cell.dataset.date = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+      const num = document.createElement('div');
+      num.className = `cal-day-num${isToday?' today':''}`;
+      num.textContent = d.getDate();
+      cell.appendChild(num);
+
+      const maxShow = 3;
+      dayBks.slice(0, maxShow).forEach(b => {
+        const chip = document.createElement('div');
+        chip.className = `cal-event-chip${b.src==='google'?' source-google':''}`;
+        if (b.src!=='google') { chip.style.background=hexRgba(b.color,0.12); chip.style.color=b.color; }
+        chip.innerHTML = `<span class="chip-dot" style="background:${b.color}"></span><span style="overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 14px)">${esc(b.name)}</span>`;
+        chip.title = `${b.name}${b.guest?' · '+b.guest:''} · ${calFmt(b.time)}`;
+        cell.appendChild(chip);
+      });
+      if (dayBks.length > maxShow) {
+        const more = document.createElement('div');
+        more.className = 'cal-more-chip';
+        more.textContent = `+${dayBks.length - maxShow} more`;
+        cell.appendChild(more);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  function calRenderWeek() {
+    const hdr = document.getElementById('cal-week-header');
+    const body = document.getElementById('cal-week-body');
+    if (!hdr || !body) return;
+    const ws = calState.weekStart;
+    const bookings = calGetBookings();
+    const SH = 7, EH = 21, SLOTS = EH - SH;
+
+    hdr.innerHTML = '<div class="cal-week-time-spacer"></div>';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws); d.setDate(d.getDate()+i);
+      const isTod = calSameDay(d, TODAY);
+      const div = document.createElement('div');
+      div.className = `cal-week-day-hdr${isTod?' today':''}`;
+      div.innerHTML = `<div class="cal-week-day-name">${CAL_DAYS[d.getDay()]}</div><div class="cal-week-day-date">${d.getDate()}</div>`;
+      hdr.appendChild(div);
+    }
+
+    body.innerHTML = '';
+    const tc = document.createElement('div');
+    tc.className = 'cal-week-time-col';
+    for (let h = SH; h < EH; h++) {
+      const lbl = document.createElement('div');
+      lbl.className = 'cal-time-label';
+      lbl.textContent = h===12?'12 PM':h>12?`${h-12} PM`:`${h} AM`;
+      tc.appendChild(lbl);
+    }
+    body.appendChild(tc);
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws); d.setDate(d.getDate()+i);
+      const isTod = calSameDay(d, TODAY);
+      const col = document.createElement('div');
+      col.className = `cal-week-col${isTod?' today-col':''}`;
+      for (let s = 0; s < SLOTS; s++) { const sl = document.createElement('div'); sl.className='cal-week-slot'; col.appendChild(sl); }
+
+      bookings.filter(b=>calSameDay(b.date,d)).forEach(b => {
+        const [h,m] = b.time.split(':').map(Number);
+        if (h<SH||h>=EH) return;
+        const top = ((h-SH)+m/60)*48;
+        const height = Math.max((b.dur/60)*48, 22);
+        const ev = document.createElement('div');
+        ev.className = 'cal-week-event';
+        ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
+        ev.innerHTML = `<div class="cal-week-event-name">${esc(b.name)}</div><div class="cal-week-event-time">${calFmt(b.time)}${b.guest?' · '+esc(b.guest):''}</div>`;
+        col.appendChild(ev);
+      });
+      body.appendChild(col);
+    }
+  }
+
+  function calRenderDay() {
+    const body = document.getElementById('cal-day-body');
+    const hdrDate = document.getElementById('cal-day-header-date');
+    const hdrCount = document.getElementById('cal-day-header-count');
+    if (!body) return;
+    const d = calState.dayDate;
+    const bookings = calGetBookings().filter(b=>calSameDay(b.date,d));
+    const SH = 7, EH = 21, SLOTS = EH-SH;
+
+    if (hdrDate) hdrDate.textContent = `${CAL_DAYS_FULL[d.getDay()]}, ${CAL_MONTHS[d.getMonth()]} ${d.getDate()}`;
+    if (hdrCount) hdrCount.textContent = bookings.length===0?'No bookings':`${bookings.length} booking${bookings.length!==1?'s':''}`;
+
+    body.innerHTML = '';
+    const tc = document.createElement('div');
+    tc.className = 'cal-week-time-col';
+    for (let h = SH; h < EH; h++) {
+      const lbl = document.createElement('div');
+      lbl.className = 'cal-time-label';
+      lbl.textContent = h===12?'12 PM':h>12?`${h-12} PM`:`${h} AM`;
+      tc.appendChild(lbl);
+    }
+    body.appendChild(tc);
+
+    const col = document.createElement('div');
+    col.className = 'cal-day-col';
+    for (let s = 0; s < SLOTS; s++) { const sl = document.createElement('div'); sl.className='cal-day-slot'; col.appendChild(sl); }
+
+    bookings.forEach(b => {
+      const [h,m] = b.time.split(':').map(Number);
+      if (h<SH||h>=EH) return;
+      const top = ((h-SH)+m/60)*48;
+      const height = Math.max((b.dur/60)*48, 44);
+      const ev = document.createElement('div');
+      ev.className = 'cal-day-event';
+      ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
+      ev.innerHTML = `<div class="cal-day-event-name">${esc(b.name)}</div>${b.guest?`<div class="cal-day-event-guest">${esc(b.guest)}</div>`:''}<div class="cal-day-event-meta">${calFmt(b.time)} · ${b.dur} min</div>`;
+      col.appendChild(ev);
+    });
+    body.appendChild(col);
+  }
+
+  function calRenderUpcoming() {
+    const list = document.getElementById('cal-upcoming-list');
+    const cntEl = document.getElementById('cal-upcoming-count');
+    if (!list) return;
+
+    const upcoming = calGetBookings()
+      .filter(b => b.date >= TODAY || calSameDay(b.date, TODAY))
+      .sort((a,b) => { const dd=a.date-b.date; return dd!==0?dd:a.time.localeCompare(b.time); })
+      .slice(0, 9);
+
+    if (cntEl) cntEl.textContent = upcoming.length;
+
+    if (upcoming.length === 0) {
+      list.innerHTML = `<div class="cal-empty-upcoming">
+        <div class="cal-empty-upcoming-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="cal-empty-upcoming-text">No upcoming bookings</div>
+        <div class="cal-empty-upcoming-sub">Bookings you schedule will appear here.</div>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = '';
+    upcoming.forEach(b => {
+      const isToday = calSameDay(b.date, TODAY);
+      const isTmrw = calSameDay(b.date, new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate()+1));
+      const dlbl = isToday ? 'Today' : isTmrw ? 'Tomorrow' : `${CAL_MONTHS[b.date.getMonth()].slice(0,3)} ${b.date.getDate()}`;
+      const item = document.createElement('div');
+      item.className = 'cal-upcoming-item';
+      item.innerHTML = `
+        <div class="cal-upcoming-color" style="background:${b.color}"></div>
+        <div class="cal-upcoming-info">
+          <div class="cal-upcoming-ev">${esc(b.name)}</div>
+          ${b.guest?`<div class="cal-upcoming-guest">${esc(b.guest)}</div>`:''}
+          <div class="cal-upcoming-time">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${dlbl} · ${calFmt(b.time)} · ${b.dur} min
+          </div>
+        </div>
+        <span class="cal-upcoming-badge ${b.src}">${b.src==='google'?'G':'S'}</span>`;
+      list.appendChild(item);
+    });
+  }
+
+  function calRender() {
+    calUpdateLabel();
+    if (calState.view==='month') calRenderMonth();
+    else if (calState.view==='week') calRenderWeek();
+    else calRenderDay();
+    calRenderUpcoming();
+  }
+
+  function calUpdateSyncUI() {
+    const syncBtn = document.getElementById('cal-sync-btn');
+    if (syncBtn) {
+      const any = Object.values(calState.synced).some(Boolean);
+      syncBtn.classList.toggle('synced', any);
+      syncBtn.innerHTML = any
+        ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><polyline points="20 6 9 17 4 12"/></svg> Calendars Synced`
+        : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg> Connect Calendar`;
+    }
+    ['google','outlook','apple'].forEach(s => {
+      const srv = document.getElementById(`sync-${s}`);
+      const st = document.getElementById(`${s}-status`);
+      const ac = document.getElementById(`${s}-action`);
+      if (!srv) return;
+      srv.classList.toggle('connected', calState.synced[s]);
+      if (st) st.textContent = calState.synced[s] ? 'Connected · syncing events' : 'Not connected';
+      if (ac) ac.textContent = calState.synced[s] ? '✓ Connected' : 'Connect';
+    });
+    const gb = document.getElementById('cal-google-badge');
+    if (gb) gb.style.display = calState.synced.google ? 'inline' : 'none';
+    const gf = document.getElementById('cal-google-filter');
+    if (gf && calState.synced.google) gf.classList.add('google-active');
+  }
+
+  function initCalendarPage() {
+    if (calState._init) { calRender(); return; }
+    calState._init = true;
+
+    const ws = new Date(TODAY); ws.setDate(TODAY.getDate() - TODAY.getDay());
+    calState.weekStart = ws;
+    calState.dayDate = new Date(TODAY);
+
+    /* View switcher */
+    document.querySelectorAll('.cal-view-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        calState.view = tab.dataset.view;
+        document.querySelectorAll('.cal-view-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('#page-calendar .cal-view').forEach(v => v.classList.remove('active'));
+        document.getElementById(`cal-view-${calState.view}`)?.classList.add('active');
+        calRender();
+      });
+    });
+
+    /* Prev / Next */
+    document.getElementById('cal-prev-btn').addEventListener('click', () => {
+      if (calState.view==='month') { calState.month===0?(calState.month=11,calState.year--):calState.month--; }
+      else if (calState.view==='week') { const w=new Date(calState.weekStart); w.setDate(w.getDate()-7); calState.weekStart=w; }
+      else { const d=new Date(calState.dayDate); d.setDate(d.getDate()-1); calState.dayDate=d; }
+      calRender();
+    });
+    document.getElementById('cal-next-btn').addEventListener('click', () => {
+      if (calState.view==='month') { calState.month===11?(calState.month=0,calState.year++):calState.month++; }
+      else if (calState.view==='week') { const w=new Date(calState.weekStart); w.setDate(w.getDate()+7); calState.weekStart=w; }
+      else { const d=new Date(calState.dayDate); d.setDate(d.getDate()+1); calState.dayDate=d; }
+      calRender();
+    });
+
+    /* Today */
+    document.getElementById('cal-today-btn').addEventListener('click', () => {
+      calState.year=TODAY.getFullYear(); calState.month=TODAY.getMonth();
+      const w=new Date(TODAY); w.setDate(TODAY.getDate()-TODAY.getDay()); calState.weekStart=w;
+      calState.dayDate=new Date(TODAY);
+      calRender();
+    });
+
+    /* Click day cell → drill into day view */
+    document.getElementById('cal-month-grid').addEventListener('click', e => {
+      const cell = e.target.closest('.cal-day-cell');
+      if (!cell) return;
+      const [y,mo,da] = cell.dataset.date.split('-').map(Number);
+      calState.dayDate = new Date(y,mo,da);
+      calState.view = 'day';
+      document.querySelectorAll('.cal-view-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelector('.cal-view-tab[data-view="day"]')?.classList.add('active');
+      document.querySelectorAll('#page-calendar .cal-view').forEach(v=>v.classList.remove('active'));
+      document.getElementById('cal-view-day')?.classList.add('active');
+      calRender();
+    });
+
+    /* Connect Calendar (top button) */
+    document.getElementById('cal-sync-btn').addEventListener('click', () => {
+      if (!calState.synced.google) {
+        calState.synced.google = true;
+        calUpdateSyncUI();
+        toast('Google Calendar connected! Your events are now synced.', 'success');
+        calRender();
+      } else {
+        toast('Calendars are already synced.', 'info');
+      }
+    });
+
+    /* Sync service cards */
+    document.querySelectorAll('.cal-sync-service').forEach(srv => {
+      srv.addEventListener('click', () => {
+        const s = srv.dataset.service;
+        calState.synced[s] = !calState.synced[s];
+        calUpdateSyncUI();
+        const n = s.charAt(0).toUpperCase()+s.slice(1);
+        toast(calState.synced[s] ? `${n} Calendar connected!` : `${n} Calendar disconnected.`, calState.synced[s]?'success':'info');
+        calRender();
+      });
+    });
+
+    /* Filter chips */
+    document.querySelectorAll('.cal-filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const src = chip.dataset.source;
+        if (src==='google') {
+          if (!calState.synced.google) {
+            calState.synced.google = true;
+            calUpdateSyncUI();
+            toast('Google Calendar connected!', 'success');
+          }
+          chip.classList.toggle('active');
+          chip.classList.toggle('google-active', chip.classList.contains('active'));
+          calRender();
+        }
+      });
+    });
+
+    calUpdateSyncUI();
+    calRender();
   }
 
 })();
