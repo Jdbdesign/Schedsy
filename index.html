@@ -1730,6 +1730,365 @@
     .em-preview-trigger .icon-eye-off { display: none; }
     .em-preview-trigger.preview-active .icon-eye     { display: none; }
     .em-preview-trigger.preview-active .icon-eye-off { display: block; }
+
+    /* ════════════════════════════════
+       BOOK MEETING BUTTON IN PREVIEW
+    ════════════════════════════════ */
+    .edp-book-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      padding: 13px;
+      background: var(--color-accent-primary); border: none;
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 600;
+      color: white; cursor: pointer;
+      margin-top: var(--space-4);
+      transition: background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
+      box-shadow: 0 4px 14px rgba(45,106,79,0.35);
+    }
+    .edp-book-btn:hover {
+      background: var(--color-accent-primary-hover);
+      box-shadow: 0 6px 20px rgba(45,106,79,0.45);
+      transform: translateY(-1px);
+    }
+    .edp-book-btn:active { transform: scale(0.98); }
+    .edp-book-btn svg { width: 16px; height: 16px; stroke-width: 2; }
+
+    /* ════════════════════════════════
+       BOOK MEETING MODAL
+    ════════════════════════════════ */
+    .bm-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(10,10,8,0.62);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-6);
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--duration-base) var(--ease-out);
+    }
+    .bm-overlay.open { opacity: 1; pointer-events: all; }
+
+    .bm-modal {
+      background: var(--color-bg-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.07);
+      width: 100%; max-width: 940px;
+      max-height: 88vh;
+      display: flex; overflow: hidden;
+      transform: translateY(22px) scale(0.97);
+      transition: transform var(--duration-slow) cubic-bezier(0.16,1,0.3,1);
+    }
+    .bm-overlay.open .bm-modal { transform: translateY(0) scale(1); }
+
+    /* ── Left panel ── */
+    .bm-left {
+      width: 360px; min-width: 360px;
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--color-border);
+      overflow: hidden;
+    }
+
+    .bm-left-header {
+      padding: var(--space-6) var(--space-6) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .bm-event-row {
+      display: flex; align-items: flex-start; gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .bm-event-icon {
+      width: 46px; height: 46px; min-width: 46px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: white; flex-shrink: 0;
+    }
+    .bm-event-icon svg { width: 20px; height: 20px; stroke-width: 1.5; }
+    .bm-event-name {
+      font-family: var(--font-display);
+      font-size: 19px; font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 4px;
+    }
+    .bm-event-host { font-size: 13px; color: var(--color-text-secondary); }
+    .bm-event-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .bm-event-tag {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px;
+      background: var(--color-bg-subtle); border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 12px; font-weight: 500; color: var(--color-text-secondary);
+    }
+    .bm-event-tag svg { width: 11px; height: 11px; stroke-width: 1.5; }
+
+    .bm-left-body {
+      flex: 1; overflow-y: auto;
+      padding: var(--space-5) var(--space-6);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .bm-left-body::-webkit-scrollbar { width: 4px; }
+    .bm-left-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+    .bm-section-title {
+      font-size: 11px; font-weight: 700;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: var(--space-3); margin-top: var(--space-5);
+    }
+    .bm-section-title:first-child { margin-top: 0; }
+
+    .bm-field { margin-bottom: var(--space-4); }
+    .bm-label {
+      display: block; font-size: 13px; font-weight: 500;
+      color: var(--color-text-primary); margin-bottom: 6px;
+    }
+    .bm-input, .bm-textarea {
+      width: 100%;
+      background: var(--color-bg-base);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px var(--space-4);
+      font-family: var(--font-body);
+      font-size: 14px; color: var(--color-text-primary);
+      transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .bm-input:focus, .bm-textarea:focus {
+      outline: none;
+      border-color: var(--color-accent-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .bm-input::placeholder, .bm-textarea::placeholder { color: var(--color-text-tertiary); }
+    .bm-textarea { min-height: 72px; resize: none; line-height: 1.5; }
+
+    #bm-guest-emails { min-height: 88px; }
+
+    .bm-left-footer {
+      padding: var(--space-4) var(--space-6) var(--space-5);
+      border-top: 1px solid var(--color-border); flex-shrink: 0;
+    }
+    .bm-submit {
+      width: 100%; padding: 12px;
+      background: var(--color-accent-primary); border: none;
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 600;
+      color: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
+      box-shadow: 0 4px 12px rgba(45,106,79,0.3);
+    }
+    .bm-submit:hover { background: var(--color-accent-primary-hover); box-shadow: 0 6px 18px rgba(45,106,79,0.4); }
+    .bm-submit:active { transform: scale(0.98); }
+    .bm-submit:disabled { opacity: 0.38; cursor: not-allowed; transform: none; box-shadow: none; }
+    .bm-submit svg { width: 16px; height: 16px; stroke-width: 2; }
+    .bm-submit-note { font-size: 11.5px; color: var(--color-text-tertiary); text-align: center; margin-top: 8px; }
+
+    /* ── Right panel ── */
+    .bm-right {
+      flex: 1; display: flex; flex-direction: column;
+      background: var(--color-bg-base); overflow: hidden; position: relative;
+    }
+    .bm-right-header {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .bm-right-title {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 600;
+      color: var(--color-text-primary); letter-spacing: -0.02em;
+    }
+    .bm-right-subtitle { font-size: 12.5px; color: var(--color-text-secondary); margin-top: 2px; }
+    .bm-close {
+      width: 32px; height: 32px;
+      background: var(--color-bg-subtle); border: none; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .bm-close:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .bm-close svg { width: 16px; height: 16px; stroke-width: 2; }
+
+    .bm-right-body { flex: 1; display: flex; overflow: hidden; }
+
+    /* Calendar */
+    .bm-cal-section {
+      flex: 1; padding: var(--space-5) var(--space-6);
+      overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .bm-month-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .bm-month-label {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 600;
+      color: var(--color-text-primary); letter-spacing: -0.015em;
+    }
+    .bm-nav-btn {
+      width: 32px; height: 32px;
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+    }
+    .bm-nav-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); border-color: var(--color-border-strong); }
+    .bm-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .bm-nav-btn svg { width: 14px; height: 14px; stroke-width: 2.5; }
+
+    .bm-cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .bm-cal-hdr {
+      text-align: center; padding: var(--space-2) 0 var(--space-3);
+      font-size: 11px; font-weight: 700; color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .bm-cal-day {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      font-size: 13.5px; font-weight: 500; color: var(--color-text-primary);
+      cursor: pointer; position: relative;
+      transition: background var(--duration-fast), color var(--duration-fast), transform var(--duration-fast);
+      border: 1.5px solid transparent;
+    }
+    .bm-cal-day.available:hover:not(.selected) {
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+      border-color: rgba(45,106,79,0.2);
+    }
+    .bm-cal-day.today:not(.selected) {
+      font-weight: 700; color: var(--color-accent-primary);
+    }
+    .bm-cal-day.today:not(.selected)::after {
+      content: ''; position: absolute; bottom: 4px; left: 50%;
+      transform: translateX(-50%);
+      width: 4px; height: 4px;
+      background: var(--color-accent-primary); border-radius: var(--radius-full);
+    }
+    .bm-cal-day.selected {
+      background: var(--color-accent-primary); color: white;
+      font-weight: 600; border-color: var(--color-accent-primary);
+      box-shadow: 0 2px 8px rgba(45,106,79,0.35);
+    }
+    .bm-cal-day.selected:active { transform: scale(0.92); }
+    .bm-cal-day.unavailable {
+      color: var(--color-text-tertiary); cursor: not-allowed; opacity: 0.45;
+    }
+    .bm-cal-day.filler { opacity: 0; pointer-events: none; }
+    .bm-cal-day.other-month { color: var(--color-text-tertiary); opacity: 0.35; cursor: default; }
+
+    /* Time slots */
+    .bm-times-pane {
+      width: 0; min-width: 0; overflow: hidden;
+      background: var(--color-bg-surface);
+      border-left: 1px solid var(--color-border);
+      display: flex; flex-direction: column;
+      transition: width var(--duration-slow) cubic-bezier(0.16,1,0.3,1),
+                  min-width var(--duration-slow) cubic-bezier(0.16,1,0.3,1);
+      flex-shrink: 0;
+    }
+    .bm-times-pane.open { width: 196px; min-width: 196px; }
+
+    .bm-times-inner { min-width: 196px; height: 100%; display: flex; flex-direction: column; }
+    .bm-times-header {
+      padding: var(--space-4) var(--space-4) var(--space-3);
+      border-bottom: 1px solid var(--color-border); flex-shrink: 0;
+    }
+    .bm-times-date-label {
+      font-size: 14px; font-weight: 700;
+      color: var(--color-text-primary); letter-spacing: -0.01em; margin-bottom: 2px;
+    }
+    .bm-times-tz { font-size: 11px; color: var(--color-text-tertiary); }
+
+    .bm-times-scroll {
+      flex: 1; overflow-y: auto; padding: var(--space-3);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .bm-times-scroll::-webkit-scrollbar { width: 4px; }
+    .bm-times-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+    .bm-time-chip {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 10px;
+      background: transparent;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 13.5px; font-weight: 500; color: var(--color-text-primary);
+      cursor: pointer; margin-bottom: 6px;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .bm-time-chip:hover {
+      border-color: var(--color-accent-primary);
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+    }
+    .bm-time-chip.selected {
+      background: var(--color-accent-primary);
+      border-color: var(--color-accent-primary);
+      color: white; font-weight: 600;
+    }
+
+    /* Success screen */
+    .bm-success-overlay {
+      position: absolute; inset: 0; z-index: 10;
+      background: var(--color-bg-surface);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: var(--space-10) var(--space-8);
+    }
+    .bm-success-overlay.show { display: flex; animation: stepSlideIn 380ms var(--ease-out) both; }
+    .bm-success-ring {
+      width: 84px; height: 84px; border-radius: var(--radius-full);
+      background: var(--color-accent-primary-light);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--space-5);
+      animation: successPop 440ms 80ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .bm-success-ring svg { width: 38px; height: 38px; stroke-width: 1.5; color: var(--color-accent-primary); }
+    .bm-success-title {
+      font-family: var(--font-display);
+      font-size: 24px; font-weight: 700;
+      color: var(--color-text-primary); letter-spacing: -0.025em; margin-bottom: var(--space-2);
+    }
+    .bm-success-body {
+      font-size: 14px; color: var(--color-text-secondary);
+      line-height: 1.65; max-width: 340px; margin-bottom: var(--space-6);
+    }
+    .bm-success-card {
+      background: var(--color-bg-subtle); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: var(--space-5); text-align: left;
+      width: 100%; max-width: 380px; margin-bottom: var(--space-6);
+    }
+    .bm-success-row {
+      display: flex; align-items: center; gap: var(--space-3);
+      font-size: 13.5px; color: var(--color-text-primary); margin-bottom: var(--space-3);
+    }
+    .bm-success-row:last-child { margin-bottom: 0; }
+    .bm-success-row-icon {
+      width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--color-bg-surface); border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .bm-success-row-icon svg { width: 14px; height: 14px; stroke-width: 1.5; color: var(--color-text-secondary); }
+    .bm-done-btn {
+      padding: 11px 36px;
+      background: var(--color-accent-primary); border: none; border-radius: var(--radius-full);
+      font-family: var(--font-body); font-size: 15px; font-weight: 600;
+      color: white; cursor: pointer;
+      transition: background var(--duration-fast), transform var(--duration-fast);
+    }
+    .bm-done-btn:hover { background: var(--color-accent-primary-hover); }
+    .bm-done-btn:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
@@ -2352,10 +2711,10 @@
             </div>
           </div>
 
-          <div class="edp-no-avail">
-            <div class="edp-no-avail-title">No openings at the moment.</div>
-            <p class="edp-no-avail-body">You haven't configured availability yet. Add working hours to start receiving bookings.</p>
-          </div>
+          <button class="edp-book-btn" id="edp-book-btn" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
+            Book Meeting
+          </button>
 
         </div>
 
@@ -2522,6 +2881,146 @@
   </div>
 </div>
 
+<!-- ════ BOOK MEETING MODAL ════ -->
+<div class="bm-overlay" id="bm-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="bm-modal-title">
+  <div class="bm-modal">
+
+    <!-- ── Left panel: Form ── -->
+    <div class="bm-left">
+      <div class="bm-left-header">
+        <div class="bm-event-row">
+          <div class="bm-event-icon" id="bm-ev-icon" style="background:#2D6A4F">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="bm-event-name" id="bm-ev-name">Meeting</div>
+            <div class="bm-event-host">with Jacob Olayinka</div>
+          </div>
+        </div>
+        <div class="bm-event-tags">
+          <span class="bm-event-tag" id="bm-ev-dur-tag">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="bm-ev-dur">30 min</span>
+          </span>
+          <span class="bm-event-tag" id="bm-ev-loc-tag">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <span id="bm-ev-loc">Google Meet</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="bm-left-body">
+        <div class="bm-section-title">Invitee details</div>
+
+        <div class="bm-field">
+          <label class="bm-label" for="bm-name">Name <span style="color:var(--color-accent-danger)">*</span></label>
+          <input class="bm-input" type="text" id="bm-name" placeholder="Your full name" autocomplete="name">
+        </div>
+
+        <div class="bm-field">
+          <label class="bm-label" for="bm-email">Email <span style="color:var(--color-accent-danger)">*</span></label>
+          <input class="bm-input" type="email" id="bm-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+
+        <div class="bm-section-title" style="margin-top:var(--space-5)">Guests</div>
+        <div class="bm-field" style="margin-bottom:0">
+          <textarea class="bm-textarea" id="bm-guest-emails" style="min-height:88px;resize:none;line-height:1.5" placeholder="Add guest emails, separated by commas&#10;e.g. alice@example.com, bob@example.com" autocomplete="off"></textarea>
+        </div>
+
+        <div class="bm-section-title" style="margin-top:var(--space-5)">Additional notes</div>
+        <div class="bm-field" style="margin-bottom:0">
+          <textarea class="bm-textarea" id="bm-notes" placeholder="Anything you'd like to share before the meeting…"></textarea>
+        </div>
+      </div>
+
+      <div class="bm-left-footer">
+        <button class="bm-submit" id="bm-submit-btn" type="button" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm booking
+        </button>
+        <p class="bm-submit-note">Select a date &amp; time to continue</p>
+      </div>
+    </div>
+
+    <!-- ── Right panel: Calendar + Times ── -->
+    <div class="bm-right">
+      <div class="bm-right-header">
+        <div>
+          <div class="bm-right-title" id="bm-modal-title">Select a date &amp; time</div>
+          <div class="bm-right-subtitle">All times shown in your local timezone</div>
+        </div>
+        <button class="bm-close" id="bm-close-btn" type="button" aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="bm-right-body">
+
+        <!-- Calendar -->
+        <div class="bm-cal-section">
+          <div class="bm-month-nav">
+            <button class="bm-nav-btn" id="bm-prev-month" type="button" aria-label="Previous month">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="bm-month-label" id="bm-month-label">June 2026</span>
+            <button class="bm-nav-btn" id="bm-next-month" type="button" aria-label="Next month">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div class="bm-cal-grid" id="bm-cal-grid">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Time slots -->
+        <div class="bm-times-pane" id="bm-times-pane">
+          <div class="bm-times-inner">
+            <div class="bm-times-header">
+              <div class="bm-times-date-label" id="bm-times-date-label">—</div>
+              <div class="bm-times-tz" id="bm-times-tz">Local time</div>
+            </div>
+            <div class="bm-times-scroll" id="bm-times-scroll">
+              <!-- rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Success overlay (covers right panel) -->
+      <div class="bm-success-overlay" id="bm-success-overlay">
+        <div class="bm-success-ring">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="bm-success-title">You're booked!</div>
+        <p class="bm-success-body">A confirmation has been sent to <strong id="bm-confirm-email"></strong>. We look forward to speaking with you.</p>
+        <div class="bm-success-card">
+          <div class="bm-success-row">
+            <div class="bm-success-row-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <span id="bm-confirm-event">Meeting</span>
+          </div>
+          <div class="bm-success-row">
+            <div class="bm-success-row-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span id="bm-confirm-datetime">—</span>
+          </div>
+          <div class="bm-success-row">
+            <div class="bm-success-row-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </div>
+            <span id="bm-confirm-loc">Google Meet</span>
+          </div>
+        </div>
+        <button class="bm-done-btn" id="bm-done-btn" type="button">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
 (function () {
 
@@ -2642,7 +3141,7 @@
 
   document.getElementById('scrim').addEventListener('click', closeDropdowns);
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); }
+    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); closeBookMeetingModal(); }
   });
 
   /* ══════════════════════════════════
@@ -2770,6 +3269,7 @@
     initChecklist();
     initEventModal();
     initEditModal();
+    initBookMeetingModal();
     renderEventTypes();
     renderActivity();
   }
@@ -3720,6 +4220,276 @@
     document.addEventListener('click', e => {
       const dd = document.getElementById('em-loc-dropdown');
       if (dd && !dd.contains(e.target)) closeEditLocDropdown();
+    });
+  }
+
+  /* ══════════════════════════════════
+     BOOK MEETING MODAL
+  ══════════════════════════════════ */
+  const MONTH_NAMES = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December'];
+  const DAY_HDRS    = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  /* Seeded pseudo-random to keep available slots consistent per day */
+  function seededRand(seed) {
+    let s = seed;
+    return function() { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646; };
+  }
+
+  /* Time slots to offer */
+  const ALL_SLOTS = [
+    '9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM',
+    '12:00 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM',
+    '3:30 PM','4:00 PM','4:30 PM','5:00 PM',
+  ];
+
+  let bmState = {
+    ev: null,
+    year: 0, month: 0,
+    selectedDay: null,
+    selectedTime: null,
+  };
+
+  function openBookMeetingModal(ev) {
+    bmState.ev = ev;
+    const now = new Date();
+    bmState.year  = now.getFullYear();
+    bmState.month = now.getMonth();
+    bmState.selectedDay  = null;
+    bmState.selectedTime = null;
+
+    /* Populate header */
+    const colorHex = (EVENT_COLORS.find(c => c.id === ev.color) || EVENT_COLORS[0]).hex;
+    const dur      = ev.duration === 'Custom' ? `${ev.customDuration || '?'} min` : ev.duration;
+    const locLabel = getEditLocLabel(normalizeLocation(ev.location));
+
+    document.getElementById('bm-ev-icon').style.background = colorHex;
+    document.getElementById('bm-ev-name').textContent      = ev.name;
+    document.getElementById('bm-ev-dur').textContent       = dur;
+    document.getElementById('bm-ev-loc').textContent       = locLabel;
+
+    /* Reset form */
+    document.getElementById('bm-name').value  = '';
+    document.getElementById('bm-email').value = '';
+    document.getElementById('bm-notes').value = '';
+    document.getElementById('bm-guest-emails').value = '';
+
+    /* Reset submit */
+    document.getElementById('bm-submit-btn').disabled = true;
+    document.querySelector('.bm-submit-note').textContent = 'Select a date & time to continue';
+
+    /* Reset time pane + success */
+    document.getElementById('bm-times-pane').classList.remove('open');
+    document.getElementById('bm-success-overlay').classList.remove('show');
+
+    /* Render calendar */
+    bmRenderCalendar();
+
+    /* Open */
+    document.getElementById('bm-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('bm-name').focus(), 300);
+  }
+
+  function closeBookMeetingModal() {
+    document.getElementById('bm-modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function bmRenderCalendar() {
+    const { year, month, selectedDay } = bmState;
+    const now    = new Date();
+    const today  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const label  = `${MONTH_NAMES[month]} ${year}`;
+    document.getElementById('bm-month-label').textContent = label;
+
+    /* Disable prev if we're already on current or earlier month */
+    const prevBtn = document.getElementById('bm-prev-month');
+    prevBtn.disabled = (year < now.getFullYear()) ||
+      (year === now.getFullYear() && month <= now.getMonth());
+
+    const grid = document.getElementById('bm-cal-grid');
+    grid.innerHTML = '';
+
+    /* Day-of-week headers */
+    DAY_HDRS.forEach(d => {
+      const hdr = document.createElement('div');
+      hdr.className = 'bm-cal-hdr';
+      hdr.textContent = d;
+      grid.appendChild(hdr);
+    });
+
+    /* First day of month — adjust so Mon=0 */
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    /* Empty filler cells */
+    for (let i = 0; i < startOffset; i++) {
+      const filler = document.createElement('div');
+      filler.className = 'bm-cal-day filler';
+      grid.appendChild(filler);
+    }
+
+    /* Day cells */
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDate   = new Date(year, month, d);
+      const isToday   = dayDate.getTime() === today.getTime();
+      const isPast    = dayDate < today;
+      const isWeekend = dayDate.getDay() === 0 || dayDate.getDay() === 6;
+
+      /* Deterministically decide availability: skip ~25% of weekdays */
+      const rng = seededRand(year * 10000 + month * 100 + d);
+      const hasSlots = !isPast && !isWeekend && rng() > 0.25;
+
+      const cell = document.createElement('div');
+      const isSelected = selectedDay &&
+        selectedDay.d === d && selectedDay.m === month && selectedDay.y === year;
+
+      cell.className = 'bm-cal-day' +
+        (isToday     ? ' today'       : '') +
+        (isSelected  ? ' selected'    : '') +
+        (hasSlots    ? ' available'   : ' unavailable');
+
+      cell.textContent = d;
+
+      if (hasSlots) {
+        cell.addEventListener('click', () => bmSelectDay(d, month, year, dayDate));
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function bmSelectDay(d, m, y, dateObj) {
+    bmState.selectedDay  = { d, m, y };
+    bmState.selectedTime = null;
+    bmRenderCalendar();
+    bmRenderTimes(dateObj);
+    bmValidateSubmit();
+  }
+
+  function bmRenderTimes(dateObj) {
+    const pane   = document.getElementById('bm-times-pane');
+    const scroll = document.getElementById('bm-times-scroll');
+    const label  = document.getElementById('bm-times-date-label');
+    const tzEl   = document.getElementById('bm-times-tz');
+
+    /* Format selected date label */
+    label.textContent = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    tzEl.textContent  = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
+
+    /* Generate slots: use seeded random to drop ~35% */
+    const { d, m, y } = bmState.selectedDay;
+    const rng = seededRand(y * 100000 + m * 1000 + d * 10 + 7);
+    const slots = ALL_SLOTS.filter(() => rng() > 0.35);
+
+    scroll.innerHTML = '';
+    slots.forEach(slot => {
+      const chip = document.createElement('button');
+      chip.type      = 'button';
+      chip.className = 'bm-time-chip' + (bmState.selectedTime === slot ? ' selected' : '');
+      chip.textContent = slot;
+      chip.addEventListener('click', () => {
+        bmState.selectedTime = slot;
+        scroll.querySelectorAll('.bm-time-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        bmValidateSubmit();
+      });
+      scroll.appendChild(chip);
+    });
+
+    pane.classList.add('open');
+  }
+
+  function bmValidateSubmit() {
+    const nameOk  = document.getElementById('bm-name').value.trim().length >= 2;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('bm-email').value.trim());
+    const timeOk  = !!bmState.selectedTime;
+    const btn     = document.getElementById('bm-submit-btn');
+    const note    = document.querySelector('.bm-submit-note');
+
+    btn.disabled = !(nameOk && emailOk && timeOk);
+
+    if (!timeOk) {
+      note.textContent = 'Select a date & time to continue';
+    } else if (!nameOk || !emailOk) {
+      note.textContent = 'Fill in your name and email to confirm';
+    } else {
+      note.textContent = '';
+    }
+  }
+
+  function bmSubmit() {
+    const name   = document.getElementById('bm-name').value.trim();
+    const email  = document.getElementById('bm-email').value.trim();
+    const { selectedDay, selectedTime, ev } = bmState;
+
+    const dateObj  = new Date(selectedDay.y, selectedDay.m, selectedDay.d);
+    const dateStr  = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const colorHex = (EVENT_COLORS.find(c => c.id === ev.color) || EVENT_COLORS[0]).hex;
+    const locLabel = getEditLocLabel(normalizeLocation(ev.location));
+    const dur      = ev.duration === 'Custom' ? `${ev.customDuration || '?'} min` : ev.duration;
+
+    /* Populate success screen */
+    document.getElementById('bm-confirm-email').textContent    = email;
+    document.getElementById('bm-confirm-event').textContent    = ev.name;
+    document.getElementById('bm-confirm-datetime').textContent = `${dateStr} · ${selectedTime} (${dur})`;
+    document.getElementById('bm-confirm-loc').textContent      = locLabel;
+
+    /* Show success */
+    document.getElementById('bm-success-overlay').classList.add('show');
+
+    /* Log activity */
+    pushActivity({
+      type: 'created',
+      text: `Booked <strong>${esc(ev.name)}</strong> with ${esc(name)} on ${esc(dateStr)} at ${esc(selectedTime)}`,
+      ts: Date.now(),
+    });
+    renderActivity();
+  }
+
+  function initBookMeetingModal() {
+    document.getElementById('bm-close-btn').addEventListener('click', closeBookMeetingModal);
+    document.getElementById('bm-modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('bm-modal-overlay')) closeBookMeetingModal();
+    });
+
+    document.getElementById('bm-prev-month').addEventListener('click', () => {
+      bmState.selectedDay  = null;
+      bmState.selectedTime = null;
+      document.getElementById('bm-times-pane').classList.remove('open');
+      if (bmState.month === 0) { bmState.month = 11; bmState.year--; }
+      else bmState.month--;
+      bmRenderCalendar();
+      bmValidateSubmit();
+    });
+
+    document.getElementById('bm-next-month').addEventListener('click', () => {
+      bmState.selectedDay  = null;
+      bmState.selectedTime = null;
+      document.getElementById('bm-times-pane').classList.remove('open');
+      if (bmState.month === 11) { bmState.month = 0; bmState.year++; }
+      else bmState.month++;
+      bmRenderCalendar();
+      bmValidateSubmit();
+    });
+
+    /* Live validate name / email */
+    ['bm-name', 'bm-email'].forEach(id => {
+      document.getElementById(id).addEventListener('input', bmValidateSubmit);
+    });
+
+    document.getElementById('bm-submit-btn').addEventListener('click', bmSubmit);
+    document.getElementById('bm-done-btn').addEventListener('click', closeBookMeetingModal);
+
+    /* Preview pane "Book Meeting" button */
+    document.getElementById('edp-book-btn').addEventListener('click', () => {
+      const evs = getEvents();
+      const ev  = evs[editEventIdx];
+      if (!ev) { toast('Save your event first', 'info'); return; }
+      closeEditModal();
+      setTimeout(() => openBookMeetingModal(ev), 120);
     });
   }
 
