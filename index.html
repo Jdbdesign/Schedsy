@@ -2397,6 +2397,451 @@
     }
     .bm-done-btn:hover { background: var(--color-accent-primary-hover); }
     .bm-done-btn:active { transform: scale(0.97); }
+
+    /* ════════════════════════════════
+       CALENDAR EVENT DETAIL DRAWER
+    ════════════════════════════════ */
+    .cal-detail-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      pointer-events: none;
+    }
+    .cal-detail-overlay.open { pointer-events: all; }
+
+    .cal-detail-scrim {
+      position: absolute; inset: 0;
+      background: rgba(26,25,22,0.48);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-out);
+      cursor: pointer;
+    }
+    .cal-detail-overlay.open .cal-detail-scrim { opacity: 1; }
+
+    .cal-detail-wrap {
+      position: absolute; top: 0; right: 0; bottom: 0;
+    }
+
+    .cal-detail-panel {
+      width: 420px; min-width: 420px; height: 100%;
+      background: var(--color-bg-surface);
+      display: flex; flex-direction: column;
+      box-shadow: -12px 0 48px rgba(26,25,22,0.11), -1px 0 0 var(--color-border);
+      transform: translateX(100%);
+      transition: transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cal-detail-overlay.open .cal-detail-panel { transform: translateX(0); }
+
+    .cdp-accent-strip { height: 5px; flex-shrink: 0; }
+
+    .cdp-header {
+      padding: var(--space-5) var(--space-6) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .cdp-header-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .cdp-badge {
+      font-size: 10px; font-weight: 700;
+      padding: 3px 10px; border-radius: var(--radius-full);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .cdp-badge.schedsy { background: var(--color-accent-primary-light); color: var(--color-accent-primary); }
+    .cdp-badge.google   { background: #EFF4FF; color: #2563EB; }
+
+    .cdp-close {
+      width: 32px; height: 32px;
+      background: var(--color-bg-subtle); border: none;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .cdp-close:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .cdp-close svg { width: 16px; height: 16px; stroke-width: 2; }
+
+    .cdp-ev-row { display: flex; align-items: flex-start; gap: var(--space-4); }
+    .cdp-ev-icon {
+      width: 50px; height: 50px; min-width: 50px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: white; flex-shrink: 0;
+    }
+    .cdp-ev-icon svg { width: 22px; height: 22px; stroke-width: 1.5; }
+    .cdp-ev-title {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.025em; line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .cdp-ev-host { font-size: 13px; color: var(--color-text-secondary); }
+
+    .cdp-body {
+      flex: 1; overflow-y: auto;
+      padding: var(--space-6);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .cdp-body::-webkit-scrollbar { width: 5px; }
+    .cdp-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    .cdp-section { margin-bottom: var(--space-5); }
+    .cdp-section-label {
+      font-size: 10.5px; font-weight: 700;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: var(--space-3);
+    }
+
+    .cdp-detail-row {
+      display: flex; align-items: flex-start; gap: var(--space-4);
+      margin-bottom: var(--space-3);
+    }
+    .cdp-detail-row:last-child { margin-bottom: 0; }
+    .cdp-detail-icon {
+      width: 36px; height: 36px; min-width: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); flex-shrink: 0; margin-top: 1px;
+    }
+    .cdp-detail-icon svg { width: 16px; height: 16px; stroke-width: 1.5; }
+    .cdp-detail-primary {
+      font-size: 14px; font-weight: 600;
+      color: var(--color-text-primary); line-height: 1.4;
+    }
+    .cdp-detail-secondary { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+
+    .cdp-guest-card {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+    .cdp-guest-avatar {
+      width: 38px; height: 38px; min-width: 38px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .cdp-guest-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+    .cdp-guest-email { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+
+    .cdp-divider { height: 1px; background: var(--color-border); margin: var(--space-5) 0; }
+
+    .cdp-link-box {
+      padding: 10px var(--space-4);
+      background: var(--color-bg-base);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .cdp-link-text {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--color-text-secondary); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .cdp-copy-btn {
+      font-size: 12px; font-weight: 600; color: var(--color-accent-primary);
+      background: none; border: none; cursor: pointer;
+      padding: 4px 8px; border-radius: var(--radius-sm);
+      white-space: nowrap; flex-shrink: 0;
+      transition: background var(--duration-fast);
+    }
+    .cdp-copy-btn:hover { background: var(--color-accent-primary-light); }
+
+    .cdp-footer {
+      padding: var(--space-4) var(--space-5);
+      border-top: 1px solid var(--color-border);
+      display: flex; align-items: center; gap: var(--space-2);
+      flex-shrink: 0;
+      background: var(--color-bg-surface);
+    }
+    .cdp-btn {
+      flex: 1; padding: 9px var(--space-3);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 12.5px; font-weight: 600; color: var(--color-text-secondary);
+      background: var(--color-bg-surface); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      transition: all var(--duration-fast); white-space: nowrap;
+    }
+    .cdp-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); border-color: var(--color-border-strong); }
+    .cdp-btn svg { width: 13px; height: 13px; stroke-width: 1.5; }
+    .cdp-btn.primary {
+      background: var(--color-accent-primary); color: white;
+      border-color: var(--color-accent-primary);
+      box-shadow: 0 2px 8px rgba(45,106,79,0.25);
+    }
+    .cdp-btn.primary:hover { background: var(--color-accent-primary-hover); border-color: var(--color-accent-primary-hover); }
+    .cdp-btn.danger { color: var(--color-accent-danger); }
+    .cdp-btn.danger:hover { background: #FEF2F2; border-color: rgba(220,38,38,0.25); color: var(--color-accent-danger); }
+
+    /* ════════════════════════════════
+       CALENDAR CREATE MEETING DRAWER
+    ════════════════════════════════ */
+    .cal-create-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      pointer-events: none;
+    }
+    .cal-create-overlay.open { pointer-events: all; }
+
+    .cal-create-scrim {
+      position: absolute; inset: 0;
+      background: rgba(26,25,22,0.48);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-out);
+      cursor: pointer;
+    }
+    .cal-create-overlay.open .cal-create-scrim { opacity: 1; }
+
+    .cal-create-wrap {
+      position: absolute; top: 0; right: 0; bottom: 0;
+    }
+
+    .cal-create-panel {
+      width: 480px; min-width: 480px; height: 100%;
+      background: var(--color-bg-surface);
+      display: flex; flex-direction: column;
+      box-shadow: -12px 0 48px rgba(26,25,22,0.11), -1px 0 0 var(--color-border);
+      transform: translateX(100%);
+      transition: transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cal-create-overlay.open .cal-create-panel { transform: translateX(0); }
+
+    .ccm-header {
+      padding: var(--space-5) var(--space-6) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .ccm-header-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .ccm-heading {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 600;
+      color: var(--color-text-primary); letter-spacing: -0.02em;
+    }
+    .ccm-close {
+      width: 32px; height: 32px;
+      background: var(--color-bg-subtle); border: none;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .ccm-close:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .ccm-close svg { width: 16px; height: 16px; stroke-width: 2; }
+
+    .ccm-date-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      font-size: 13px; font-weight: 600;
+    }
+    .ccm-date-chip svg { width: 13px; height: 13px; stroke-width: 2; }
+
+    .ccm-body {
+      flex: 1; overflow-y: auto;
+      padding: var(--space-6);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .ccm-body::-webkit-scrollbar { width: 5px; }
+    .ccm-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    .ccm-field { margin-bottom: var(--space-5); }
+    .ccm-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--color-text-primary); margin-bottom: var(--space-2);
+    }
+    .ccm-label-hint { font-size: 12px; font-weight: 400; color: var(--color-text-tertiary); margin-left: 5px; }
+    .ccm-input, .ccm-textarea, .ccm-select {
+      width: 100%;
+      background: var(--color-bg-base);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px var(--space-4);
+      font-family: var(--font-body);
+      font-size: 14px; color: var(--color-text-primary);
+      transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .ccm-input:focus, .ccm-textarea:focus, .ccm-select:focus {
+      outline: none;
+      border-color: var(--color-accent-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .ccm-input::placeholder, .ccm-textarea::placeholder { color: var(--color-text-tertiary); }
+    .ccm-textarea { min-height: 72px; resize: none; line-height: 1.5; }
+    .ccm-select {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A09E98' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+      padding-right: 40px;
+    }
+
+    .ccm-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+
+    .ccm-dur-grid { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+    .ccm-dur-chip {
+      padding: 8px var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-family: var(--font-body);
+      font-size: 13px; font-weight: 500; color: var(--color-text-secondary);
+      cursor: pointer; background: var(--color-bg-surface);
+      transition: all var(--duration-fast);
+    }
+    .ccm-dur-chip:hover { border-color: var(--color-accent-primary); color: var(--color-accent-primary); background: var(--color-accent-primary-light); }
+    .ccm-dur-chip.selected { border-color: var(--color-accent-primary); background: var(--color-accent-primary); color: white; }
+
+    .ccm-color-row { display: flex; gap: 10px; }
+    .ccm-color-dot {
+      width: 28px; height: 28px; border-radius: var(--radius-full);
+      border: 3px solid transparent; cursor: pointer;
+      transition: transform var(--duration-fast), border-color var(--duration-fast);
+    }
+    .ccm-color-dot:hover { transform: scale(1.12); }
+    .ccm-color-dot.selected { border-color: var(--color-text-primary); transform: scale(1.15); }
+
+    .ccm-invitee-wrap {
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .ccm-invitee-wrap:focus-within {
+      border-color: var(--color-accent-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .ccm-invitee-tags {
+      display: flex; flex-wrap: wrap; gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg-base);
+      min-height: 0;
+    }
+    .ccm-invitee-tags:empty { display: none; }
+    .ccm-invitee-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+      border-radius: var(--radius-full);
+      padding: 3px 10px; font-size: 12px; font-weight: 500;
+    }
+    .ccm-invitee-remove {
+      background: none; border: none; cursor: pointer;
+      color: var(--color-accent-primary); padding: 0;
+      display: flex; align-items: center;
+      opacity: 0.6; transition: opacity var(--duration-fast);
+    }
+    .ccm-invitee-remove:hover { opacity: 1; }
+    .ccm-invitee-remove svg { width: 12px; height: 12px; stroke-width: 2.5; }
+    .ccm-invitee-input-row { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); background: var(--color-bg-base); }
+    .ccm-invitee-input {
+      flex: 1; border: none; background: transparent;
+      font-family: var(--font-body); font-size: 14px; color: var(--color-text-primary);
+      padding: 6px var(--space-2);
+    }
+    .ccm-invitee-input:focus { outline: none; }
+    .ccm-invitee-input::placeholder { color: var(--color-text-tertiary); }
+    .ccm-add-btn {
+      padding: 6px 12px;
+      background: var(--color-bg-subtle); border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 12px; font-weight: 600; color: var(--color-text-secondary);
+      cursor: pointer; flex-shrink: 0;
+      transition: all var(--duration-fast);
+    }
+    .ccm-add-btn:hover { border-color: var(--color-accent-primary); color: var(--color-accent-primary); background: var(--color-accent-primary-light); }
+
+    .ccm-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3);
+      flex-shrink: 0;
+    }
+
+    /* Success state */
+    .ccm-success {
+      flex: 1; overflow-y: auto;
+      display: none; flex-direction: column; align-items: center;
+      text-align: center; padding: var(--space-12) var(--space-6);
+    }
+    .ccm-success.show { display: flex; animation: stepSlideIn 380ms var(--ease-out) both; }
+    .ccm-success-ring {
+      width: 72px; height: 72px; border-radius: var(--radius-full);
+      background: var(--color-accent-primary-light);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--space-4);
+      animation: successPop 440ms 80ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .ccm-success-ring svg { width: 32px; height: 32px; stroke-width: 1.5; color: var(--color-accent-primary); }
+    .ccm-success-title {
+      font-family: var(--font-display);
+      font-size: 21px; font-weight: 700;
+      color: var(--color-text-primary); letter-spacing: -0.025em; margin-bottom: var(--space-2);
+    }
+    .ccm-success-body {
+      font-size: 14px; color: var(--color-text-secondary);
+      line-height: 1.65; max-width: 310px; margin-bottom: var(--space-6);
+    }
+    .ccm-invite-box {
+      width: 100%; text-align: left;
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+    .ccm-invite-box-label {
+      font-size: 10.5px; font-weight: 700; color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: var(--space-3);
+    }
+    .ccm-invite-link-row {
+      display: flex; align-items: center; gap: var(--space-3);
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 9px var(--space-3);
+    }
+    .ccm-invite-link-text {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--color-text-secondary); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ccm-invite-copy-btn {
+      font-size: 12px; font-weight: 600; color: var(--color-accent-primary);
+      background: none; border: none; cursor: pointer;
+      padding: 3px 8px; border-radius: var(--radius-sm);
+      white-space: nowrap; flex-shrink: 0;
+      transition: background var(--duration-fast);
+    }
+    .ccm-invite-copy-btn:hover { background: var(--color-accent-primary-light); }
+
+    /* Cal event chips — make cursor pointer clear */
+    .cal-event-chip { cursor: pointer !important; }
+
+    /* Day / week slots — hover hint for empty areas */
+    .cal-week-slot:hover, .cal-day-slot:hover {
+      background: rgba(45,106,79,0.04);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cal-detail-panel, .cal-detail-scrim,
+      .cal-create-panel, .cal-create-scrim { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -3498,6 +3943,226 @@
   </div>
 </div>
 
+<!-- ════ CALENDAR EVENT DETAIL DRAWER ════ -->
+<div class="cal-detail-overlay" id="cal-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="cdp-ev-title">
+  <div class="cal-detail-scrim" id="cal-detail-scrim"></div>
+  <div class="cal-detail-wrap">
+    <div class="cal-detail-panel">
+
+      <!-- Color accent strip -->
+      <div class="cdp-accent-strip" id="cdp-accent-strip"></div>
+
+      <!-- Header -->
+      <div class="cdp-header">
+        <div class="cdp-header-top">
+          <span class="cdp-badge schedsy" id="cdp-badge">Schedsy</span>
+          <button class="cdp-close" id="cdp-close-btn" type="button" aria-label="Close event detail">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="cdp-ev-row">
+          <div class="cdp-ev-icon" id="cdp-ev-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="cdp-ev-title" id="cdp-ev-title">Event Name</div>
+            <div class="cdp-ev-host" id="cdp-ev-host">with Jacob Olayinka</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="cdp-body">
+
+        <!-- When -->
+        <div class="cdp-section">
+          <div class="cdp-section-label">When</div>
+          <div class="cdp-detail-row">
+            <div class="cdp-detail-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <div class="cdp-detail-primary" id="cdp-date-label">—</div>
+              <div class="cdp-detail-secondary" id="cdp-time-label">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest -->
+        <div class="cdp-section" id="cdp-guest-section">
+          <div class="cdp-section-label">Guest</div>
+          <div class="cdp-guest-card">
+            <div class="cdp-guest-avatar" id="cdp-guest-initials">?</div>
+            <div>
+              <div class="cdp-guest-name" id="cdp-guest-name">—</div>
+              <div class="cdp-guest-email" id="cdp-guest-email"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div class="cdp-section">
+          <div class="cdp-section-label">Location</div>
+          <div class="cdp-detail-row">
+            <div class="cdp-detail-icon" id="cdp-loc-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </div>
+            <div>
+              <div class="cdp-detail-primary" id="cdp-location">Google Meet</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cdp-divider"></div>
+
+        <!-- Meeting link -->
+        <div class="cdp-section" id="cdp-link-section">
+          <div class="cdp-section-label">Meeting link</div>
+          <div class="cdp-link-box">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:13px;height:13px;color:var(--color-text-tertiary);flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span class="cdp-link-text" id="cdp-link-text">schedsy.com/jacob/…</span>
+            <button class="cdp-copy-btn" id="cdp-copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="cdp-footer">
+        <button class="cdp-btn primary" id="cdp-join-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          Join Meeting
+        </button>
+        <button class="cdp-btn" id="cdp-reschedule-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          Reschedule
+        </button>
+        <button class="cdp-btn danger" id="cdp-cancel-event-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════ CALENDAR CREATE MEETING DRAWER ════ -->
+<div class="cal-create-overlay" id="cal-create-overlay" role="dialog" aria-modal="true" aria-labelledby="ccm-heading">
+  <div class="cal-create-scrim" id="cal-create-scrim"></div>
+  <div class="cal-create-wrap">
+    <div class="cal-create-panel">
+
+      <!-- Header -->
+      <div class="ccm-header">
+        <div class="ccm-header-top">
+          <div class="ccm-heading" id="ccm-heading">Schedule a Meeting</div>
+          <button class="ccm-close" id="ccm-close-btn" type="button" aria-label="Close create meeting">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="ccm-date-chip">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="ccm-date-label">—</span>
+        </div>
+      </div>
+
+      <!-- Form body -->
+      <div class="ccm-body" id="ccm-form-body">
+
+        <div class="ccm-field">
+          <label class="ccm-label" for="ccm-title">Meeting title <span style="color:var(--color-accent-danger)">*</span></label>
+          <input class="ccm-input" type="text" id="ccm-title" placeholder="e.g. Coffee Chat, Product Review…" maxlength="80" autocomplete="off">
+        </div>
+
+        <div class="ccm-row-2">
+          <div class="ccm-field" style="margin-bottom:0">
+            <label class="ccm-label" for="ccm-start-time">Start time</label>
+            <select class="ccm-select" id="ccm-start-time"></select>
+          </div>
+          <div class="ccm-field" style="margin-bottom:0">
+            <label class="ccm-label" for="ccm-location-sel">Location</label>
+            <select class="ccm-select" id="ccm-location-sel">
+              <option value="google-meet">Google Meet</option>
+              <option value="zoom">Zoom</option>
+              <option value="ms-teams">Microsoft Teams</option>
+              <option value="phone">Phone call</option>
+              <option value="inperson">In person</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ccm-field" style="margin-top:var(--space-5)">
+          <label class="ccm-label">Duration</label>
+          <div class="ccm-dur-grid">
+            <button class="ccm-dur-chip" data-dur="15" type="button">15 min</button>
+            <button class="ccm-dur-chip selected" data-dur="30" type="button">30 min</button>
+            <button class="ccm-dur-chip" data-dur="45" type="button">45 min</button>
+            <button class="ccm-dur-chip" data-dur="60" type="button">60 min</button>
+            <button class="ccm-dur-chip" data-dur="90" type="button">90 min</button>
+          </div>
+        </div>
+
+        <div class="ccm-field">
+          <label class="ccm-label">Color</label>
+          <div class="ccm-color-row">
+            <div class="ccm-color-dot selected" data-color="#2D6A4F" style="background:#2D6A4F" title="Forest Green" role="radio" tabindex="0" aria-label="Forest Green"></div>
+            <div class="ccm-color-dot" data-color="#2563EB" style="background:#2563EB" title="Ocean Blue"   role="radio" tabindex="0" aria-label="Ocean Blue"></div>
+            <div class="ccm-color-dot" data-color="#C4702A" style="background:#C4702A" title="Warm Amber"   role="radio" tabindex="0" aria-label="Warm Amber"></div>
+            <div class="ccm-color-dot" data-color="#7C3AED" style="background:#7C3AED" title="Purple"       role="radio" tabindex="0" aria-label="Purple"></div>
+            <div class="ccm-color-dot" data-color="#E11D48" style="background:#E11D48" title="Rose"         role="radio" tabindex="0" aria-label="Rose"></div>
+            <div class="ccm-color-dot" data-color="#0891B2" style="background:#0891B2" title="Teal"         role="radio" tabindex="0" aria-label="Teal"></div>
+          </div>
+        </div>
+
+        <div class="ccm-field">
+          <label class="ccm-label">Invitees <span class="ccm-label-hint">(optional)</span></label>
+          <div class="ccm-invitee-wrap">
+            <div class="ccm-invitee-tags" id="ccm-invitee-tags"></div>
+            <div class="ccm-invitee-input-row">
+              <input class="ccm-invitee-input" type="email" id="ccm-invitee-input" placeholder="Add invitee email and press Enter…" autocomplete="email">
+              <button class="ccm-add-btn" id="ccm-add-invitee-btn" type="button">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ccm-field" style="margin-bottom:0">
+          <label class="ccm-label" for="ccm-notes">Notes <span class="ccm-label-hint">(optional)</span></label>
+          <textarea class="ccm-textarea" id="ccm-notes" placeholder="Agenda, talking points, or context for your guests…"></textarea>
+        </div>
+
+      </div>
+
+      <!-- Success state -->
+      <div class="ccm-success" id="ccm-success">
+        <div class="ccm-success-ring">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="ccm-success-title">Meeting Scheduled!</div>
+        <p class="ccm-success-body">Your meeting has been added to the calendar. Copy the invite link and share it with your guests.</p>
+        <div class="ccm-invite-box">
+          <div class="ccm-invite-box-label">Invite link</div>
+          <div class="ccm-invite-link-row">
+            <span class="ccm-invite-link-text" id="ccm-invite-link-text">schedsy.com/jacob/…</span>
+            <button class="ccm-invite-copy-btn" id="ccm-invite-copy-btn" type="button">Copy link</button>
+          </div>
+        </div>
+        <button class="btn-ghost" id="ccm-done-btn" type="button" style="width:100%;justify-content:center;padding:11px">Done</button>
+      </div>
+
+      <!-- Footer -->
+      <div class="ccm-footer" id="ccm-footer">
+        <button class="btn-ghost" id="ccm-cancel-btn" type="button">Cancel</button>
+        <button class="btn-primary" id="ccm-submit-btn" type="button" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Schedule Meeting
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
 
@@ -3618,7 +4283,7 @@
 
   document.getElementById('scrim').addEventListener('click', closeDropdowns);
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); closeBookMeetingModal(); }
+    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); closeBookMeetingModal(); closeCalEventDetail(); closeCalCreateMeeting(); }
   });
 
   /* ══════════════════════════════════
@@ -5100,6 +5765,14 @@
         list.push({ ...b, date: d });
       });
     }
+    /* Custom meetings created via the Create Meeting drawer */
+    try {
+      const custom = JSON.parse(localStorage.getItem('schedsy_cal_meetings') || '[]');
+      custom.forEach(m => {
+        const d = new Date(m.dateStr);
+        if (!isNaN(d)) list.push({ ...m, date: d, src: 'schedsy' });
+      });
+    } catch(e) {}
     return list;
   }
 
@@ -5187,6 +5860,7 @@
         if (b.src!=='google') { chip.style.background=hexRgba(b.color,0.12); chip.style.color=b.color; }
         chip.innerHTML = `<span class="chip-dot" style="background:${b.color}"></span><span style="overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 14px)">${esc(b.name)}</span>`;
         chip.title = `${b.name}${b.guest?' · '+b.guest:''} · ${calFmt(b.time)}`;
+        chip.addEventListener('click', e => { e.stopPropagation(); openCalEventDetail(b); });
         cell.appendChild(chip);
       });
       if (dayBks.length > maxShow) {
@@ -5244,6 +5918,7 @@
         ev.className = 'cal-week-event';
         ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
         ev.innerHTML = `<div class="cal-week-event-name">${esc(b.name)}</div><div class="cal-week-event-time">${calFmt(b.time)}${b.guest?' · '+esc(b.guest):''}</div>`;
+        ev.addEventListener('click', () => openCalEventDetail(b));
         col.appendChild(ev);
       });
       body.appendChild(col);
@@ -5286,6 +5961,7 @@
       ev.className = 'cal-day-event';
       ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
       ev.innerHTML = `<div class="cal-day-event-name">${esc(b.name)}</div>${b.guest?`<div class="cal-day-event-guest">${esc(b.guest)}</div>`:''}<div class="cal-day-event-meta">${calFmt(b.time)} · ${b.dur} min</div>`;
+      ev.addEventListener('click', () => openCalEventDetail(b));
       col.appendChild(ev);
     });
     body.appendChild(col);
@@ -5413,13 +6089,19 @@
       const cell = e.target.closest('.cal-day-cell');
       if (!cell) return;
       const [y,mo,da] = cell.dataset.date.split('-').map(Number);
-      calState.dayDate = new Date(y,mo,da);
-      calState.view = 'day';
-      document.querySelectorAll('.cal-view-tab').forEach(t=>t.classList.remove('active'));
-      document.querySelector('.cal-view-tab[data-view="day"]')?.classList.add('active');
-      document.querySelectorAll('#page-calendar .cal-view').forEach(v=>v.classList.remove('active'));
-      document.getElementById('cal-view-day')?.classList.add('active');
-      calRender();
+      const clickedDate = new Date(y, mo, da);
+      const hasEvents = !!cell.querySelector('.cal-event-chip');
+      if (!hasEvents) {
+        openCalCreateMeeting(clickedDate);
+      } else {
+        calState.dayDate = clickedDate;
+        calState.view = 'day';
+        document.querySelectorAll('.cal-view-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelector('.cal-view-tab[data-view="day"]')?.classList.add('active');
+        document.querySelectorAll('#page-calendar .cal-view').forEach(v=>v.classList.remove('active'));
+        document.getElementById('cal-view-day')?.classList.add('active');
+        calRender();
+      }
     });
 
     /* Connect Calendar (top button) */
@@ -5465,6 +6147,319 @@
 
     calUpdateSyncUI();
     calRender();
+
+    /* Init both new calendar drawers */
+    initCalEventDetail();
+    initCalCreateMeeting();
+  }
+
+  /* ═══════════════════════════════════════════════
+     CALENDAR EVENT DETAIL DRAWER
+  ═══════════════════════════════════════════════ */
+
+  function openCalEventDetail(booking) {
+    const overlay = document.getElementById('cal-detail-overlay');
+    if (!overlay) return;
+
+    /* Color strip */
+    const strip = document.getElementById('cdp-accent-strip');
+    if (strip) strip.style.background = booking.color || '#2D6A4F';
+
+    /* Badge */
+    const badge = document.getElementById('cdp-badge');
+    if (badge) {
+      badge.textContent = booking.src === 'google' ? 'Google Calendar' : 'Schedsy';
+      badge.className = 'cdp-badge ' + (booking.src === 'google' ? 'google' : 'schedsy');
+    }
+
+    /* Event icon */
+    const icon = document.getElementById('cdp-ev-icon');
+    if (icon) icon.style.background = hexRgba(booking.color || '#2D6A4F', 0.12);
+
+    /* Title */
+    const titleEl = document.getElementById('cdp-ev-title');
+    if (titleEl) titleEl.textContent = booking.name || 'Meeting';
+
+    /* Date/Time */
+    const dateEl = document.getElementById('cdp-date-label');
+    const timeEl = document.getElementById('cdp-time-label');
+    if (dateEl && booking.date) {
+      dateEl.textContent = booking.date.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    }
+    if (timeEl) {
+      const [h, m] = (booking.time || '09:00').split(':').map(Number);
+      const endMin = h * 60 + m + (booking.dur || 30);
+      const fmtT = t => { const hh = Math.floor(t/60), mm = t%60; const ampm = hh>=12?'PM':'AM'; return `${hh===0?12:hh>12?hh-12:hh}:${String(mm).padStart(2,'0')} ${ampm}`; };
+      timeEl.textContent = `${fmtT(h*60+m)} – ${fmtT(endMin)} · ${booking.dur || 30} min`;
+    }
+
+    /* Guest */
+    const guestSection = document.getElementById('cdp-guest-section');
+    const guestName = document.getElementById('cdp-guest-name');
+    const guestEmail = document.getElementById('cdp-guest-email');
+    const guestInitials = document.getElementById('cdp-guest-initials');
+    if (booking.guest) {
+      if (guestSection) guestSection.style.display = '';
+      if (guestName) guestName.textContent = booking.guest;
+      if (guestEmail) guestEmail.textContent = booking.guestEmail || '';
+      if (guestInitials) guestInitials.textContent = booking.guest.trim().split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    } else {
+      if (guestSection) guestSection.style.display = 'none';
+    }
+
+    /* Location */
+    const locEl = document.getElementById('cdp-location');
+    const locIcon = document.getElementById('cdp-loc-icon');
+    const locMap = { 'google-meet':'Google Meet', 'zoom':'Zoom', 'ms-teams':'Microsoft Teams', 'phone':'Phone Call', 'inperson':'In Person' };
+    const locStr = locMap[booking.location] || booking.location || 'Google Meet';
+    if (locEl) locEl.textContent = locStr;
+    if (locIcon) {
+      if (locStr === 'In Person') {
+        locIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+      } else if (locStr === 'Phone Call') {
+        locIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.57 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+      }
+    }
+
+    /* Meeting link */
+    const linkSection = document.getElementById('cdp-link-section');
+    const linkText = document.getElementById('cdp-link-text');
+    const meetingLink = booking.inviteLink || `schedsy.com/jacob/${slugify(booking.name || 'meeting')}-${booking.id}`;
+    if (linkText) linkText.textContent = meetingLink;
+    if (linkSection) linkSection.style.display = '';
+
+    /* Join button */
+    const joinBtn = document.getElementById('cdp-join-btn');
+    if (joinBtn) joinBtn.onclick = () => toast('Opening meeting link…', 'info');
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCalEventDetail() {
+    const overlay = document.getElementById('cal-detail-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function initCalEventDetail() {
+    const overlay = document.getElementById('cal-detail-overlay');
+    if (!overlay || overlay._init) return;
+    overlay._init = true;
+
+    document.getElementById('cdp-close-btn')?.addEventListener('click', closeCalEventDetail);
+    document.getElementById('cal-detail-scrim')?.addEventListener('click', closeCalEventDetail);
+
+    document.getElementById('cdp-copy-btn')?.addEventListener('click', () => {
+      const txt = document.getElementById('cdp-link-text')?.textContent || '';
+      navigator.clipboard.writeText(txt).then(() => toast('Link copied!', 'success')).catch(() => toast('Copied!', 'success'));
+    });
+
+    document.getElementById('cdp-reschedule-btn')?.addEventListener('click', () => {
+      toast('Rescheduling flow coming soon.', 'info');
+    });
+
+    document.getElementById('cdp-cancel-event-btn')?.addEventListener('click', () => {
+      closeCalEventDetail();
+      toast('Meeting cancelled.', 'info');
+    });
+  }
+
+  /* ═══════════════════════════════════════════════
+     CALENDAR CREATE MEETING DRAWER
+  ═══════════════════════════════════════════════ */
+
+  let _calCreateState = { date: null, duration: 30, color: '#2D6A4F', invitees: [] };
+
+  function openCalCreateMeeting(date) {
+    const overlay = document.getElementById('cal-create-overlay');
+    if (!overlay) return;
+
+    _calCreateState = { date: date || new Date(), duration: 30, color: '#2D6A4F', invitees: [] };
+
+    /* Set date chip */
+    const dateLabel = document.getElementById('ccm-date-label');
+    if (dateLabel) dateLabel.textContent = _calCreateState.date.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' });
+
+    /* Reset form */
+    const titleInput = document.getElementById('ccm-title');
+    const notesInput = document.getElementById('ccm-notes');
+    const tagContainer = document.getElementById('ccm-invitee-tags');
+    const inviteeInput = document.getElementById('ccm-invitee-input');
+    if (titleInput) { titleInput.value = ''; }
+    if (notesInput) { notesInput.value = ''; }
+    if (tagContainer) { tagContainer.innerHTML = ''; }
+    if (inviteeInput) { inviteeInput.value = ''; }
+
+    /* Reset duration chips */
+    document.querySelectorAll('.ccm-dur-chip').forEach(c => {
+      c.classList.toggle('selected', c.dataset.dur === '30');
+    });
+
+    /* Reset color dots */
+    document.querySelectorAll('.ccm-color-dot').forEach(d => {
+      d.classList.toggle('selected', d.dataset.color === '#2D6A4F');
+    });
+
+    /* Populate time select */
+    const timeSel = document.getElementById('ccm-start-time');
+    if (timeSel) {
+      timeSel.innerHTML = '';
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMin = now.getMinutes() < 30 ? 30 : 0;
+      const defaultHour = currentMin === 0 ? currentHour + 1 : currentHour;
+      for (let h = 7; h <= 20; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const val = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h;
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = `${displayH}:${String(m).padStart(2,'0')} ${ampm}`;
+          if (h === defaultHour && m === 0) opt.selected = true;
+          timeSel.appendChild(opt);
+        }
+      }
+    }
+
+    /* Show form, hide success */
+    const formBody = document.getElementById('ccm-form-body');
+    const successEl = document.getElementById('ccm-success');
+    const footer = document.getElementById('ccm-footer');
+    if (formBody) formBody.style.display = '';
+    if (successEl) successEl.style.display = 'none';
+    if (footer) footer.style.display = '';
+
+    /* Disable submit until title entered */
+    const submitBtn = document.getElementById('ccm-submit-btn');
+    if (submitBtn) submitBtn.disabled = true;
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => titleInput?.focus(), 300);
+  }
+
+  function closeCalCreateMeeting() {
+    const overlay = document.getElementById('cal-create-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function submitCalMeeting() {
+    const title = (document.getElementById('ccm-title')?.value || '').trim();
+    const time = document.getElementById('ccm-start-time')?.value || '09:00';
+    const location = document.getElementById('ccm-location-sel')?.value || 'google-meet';
+    const notes = document.getElementById('ccm-notes')?.value || '';
+    if (!title) return;
+
+    const id = 'cm_' + Date.now();
+    const dateStr = _calCreateState.date.toISOString().split('T')[0];
+    const inviteLink = `schedsy.com/jacob/${slugify(title)}-${id.slice(-6)}`;
+    const meeting = {
+      id, name: title, time, dur: _calCreateState.duration,
+      color: _calCreateState.color, location, notes,
+      dateStr, inviteLink,
+      invitees: [..._calCreateState.invitees],
+      src: 'schedsy'
+    };
+
+    /* Persist */
+    try {
+      const existing = JSON.parse(localStorage.getItem('schedsy_cal_meetings') || '[]');
+      existing.push(meeting);
+      localStorage.setItem('schedsy_cal_meetings', JSON.stringify(existing));
+    } catch(e) {}
+
+    /* Show success state */
+    const formBody = document.getElementById('ccm-form-body');
+    const successEl = document.getElementById('ccm-success');
+    const footer = document.getElementById('ccm-footer');
+    const invLinkText = document.getElementById('ccm-invite-link-text');
+    if (formBody) formBody.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (successEl) successEl.style.display = '';
+    if (invLinkText) invLinkText.textContent = inviteLink;
+
+    calRender();
+  }
+
+  function _ccmAddInvitee(email) {
+    email = email.trim();
+    if (!email || !email.includes('@')) return;
+    if (_calCreateState.invitees.includes(email)) return;
+    _calCreateState.invitees.push(email);
+    const tags = document.getElementById('ccm-invitee-tags');
+    if (!tags) return;
+    const tag = document.createElement('div');
+    tag.className = 'ccm-invitee-tag';
+    tag.dataset.email = email;
+    tag.innerHTML = `<span>${esc(email)}</span><button type="button" class="ccm-tag-remove" aria-label="Remove ${esc(email)}">×</button>`;
+    tag.querySelector('.ccm-tag-remove').addEventListener('click', () => {
+      _calCreateState.invitees = _calCreateState.invitees.filter(e => e !== email);
+      tag.remove();
+    });
+    tags.appendChild(tag);
+  }
+
+  function initCalCreateMeeting() {
+    const overlay = document.getElementById('cal-create-overlay');
+    if (!overlay || overlay._init) return;
+    overlay._init = true;
+
+    document.getElementById('ccm-close-btn')?.addEventListener('click', closeCalCreateMeeting);
+    document.getElementById('ccm-cancel-btn')?.addEventListener('click', closeCalCreateMeeting);
+    document.getElementById('cal-create-scrim')?.addEventListener('click', closeCalCreateMeeting);
+
+    /* Title validation → enable submit */
+    document.getElementById('ccm-title')?.addEventListener('input', e => {
+      const submitBtn = document.getElementById('ccm-submit-btn');
+      if (submitBtn) submitBtn.disabled = !e.target.value.trim();
+    });
+
+    /* Duration chips */
+    document.querySelectorAll('.ccm-dur-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.ccm-dur-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        _calCreateState.duration = parseInt(chip.dataset.dur);
+      });
+    });
+
+    /* Color dots */
+    document.querySelectorAll('.ccm-color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        document.querySelectorAll('.ccm-color-dot').forEach(d => d.classList.remove('selected'));
+        dot.classList.add('selected');
+        _calCreateState.color = dot.dataset.color;
+      });
+    });
+
+    /* Invitee add button */
+    document.getElementById('ccm-add-invitee-btn')?.addEventListener('click', () => {
+      const inp = document.getElementById('ccm-invitee-input');
+      if (inp) { _ccmAddInvitee(inp.value); inp.value = ''; inp.focus(); }
+    });
+
+    document.getElementById('ccm-invitee-input')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        _ccmAddInvitee(e.target.value);
+        e.target.value = '';
+      }
+    });
+
+    /* Submit */
+    document.getElementById('ccm-submit-btn')?.addEventListener('click', submitCalMeeting);
+
+    /* Copy invite link */
+    document.getElementById('ccm-invite-copy-btn')?.addEventListener('click', () => {
+      const txt = document.getElementById('ccm-invite-link-text')?.textContent || '';
+      navigator.clipboard.writeText(txt).then(() => toast('Invite link copied!', 'success')).catch(() => toast('Copied!', 'success'));
+    });
+
+    /* Done button */
+    document.getElementById('ccm-done-btn')?.addEventListener('click', closeCalCreateMeeting);
   }
 
 })();
