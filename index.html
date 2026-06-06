@@ -612,6 +612,13 @@
 
     /* ── Today's schedule ── */
     .schedule-card { padding: var(--space-5) var(--space-6); margin-bottom: var(--space-6); }
+    .schedule-item { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--color-border); cursor:pointer; transition:background var(--duration-fast); border-radius:var(--radius-sm); }
+    .schedule-item:last-child { border-bottom:none; }
+    .schedule-item:hover { background:var(--color-bg-subtle); padding-left:6px; padding-right:6px; margin-left:-6px; margin-right:-6px; }
+    .schedule-item-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:3px; }
+    .schedule-item-body { flex:1; min-width:0; }
+    .schedule-item-name { font-size:13px; font-weight:600; color:var(--color-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .schedule-item-meta { font-size:11px; color:var(--color-text-secondary); margin-top:2px; }
 
     /* ── Stats row ── */
     .stats-row {
@@ -3108,7 +3115,7 @@
               <h2 class="sec-title">Today's Schedule</h2>
               <a href="#" class="sec-link" id="view-cal-link">View calendar →</a>
             </div>
-            <div class="card schedule-card">
+            <div class="card schedule-card" id="home-schedule-body">
               <div class="empty">
                 <div class="empty-icon" aria-hidden="true"><i data-lucide="calendar"></i></div>
                 <div class="empty-head">Your day is clear</div>
@@ -3126,17 +3133,17 @@
             <div class="stats-row">
               <div class="card stat-card">
                 <div class="stat-label">This Week</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="stat-week-val">0</div>
                 <div class="stat-meta">meetings booked</div>
               </div>
               <div class="card stat-card">
                 <div class="stat-label">This Month</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="stat-month-val">0</div>
                 <div class="stat-meta">total bookings</div>
               </div>
               <div class="card stat-card">
                 <div class="stat-label">Pending</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="stat-pending-val">0</div>
                 <div class="stat-meta">confirmations</div>
               </div>
             </div>
@@ -4392,6 +4399,9 @@
           if (window.lucide) lucide.createIcons();
         } else if (page === 'home') {
           switchPage('home');
+          renderHomeSchedule();
+          renderHomeStats();
+          if (window.lucide) lucide.createIcons();
         } else if (page === 'calendar') {
           switchPage('calendar');
           initCalendarPage();
@@ -4490,6 +4500,8 @@
     initBookMeetingModal();
     renderEventTypes();
     renderActivity();
+    renderHomeSchedule();
+    renderHomeStats();
   }
 
   /* ── Page switch ── */
@@ -4512,6 +4524,9 @@
       if (window.lucide) lucide.createIcons();
     } else if (page === 'home') {
       switchPage('home');
+      renderHomeSchedule();
+      renderHomeStats();
+      if (window.lucide) lucide.createIcons();
     } else if (page === 'calendar') {
       switchPage('calendar');
       initCalendarPage();
@@ -5719,6 +5734,8 @@
       ts: Date.now(),
     });
     renderActivity();
+    renderHomeSchedule();
+    renderHomeStats();
   }
 
   function initBookMeetingModal() {
@@ -5811,6 +5828,90 @@
     { id:'g3', name:'Gym Session',           guest:'', time:'07:00', dur:60,  color:'#1A73E8', src:'google', off:2  },
     { id:'g4', name:'Birthday Party',        guest:'', time:'18:00', dur:120, color:'#E67C73', src:'google', off:17 },
   ];
+
+  /* ── Home page: Today's Schedule ── */
+  function renderHomeSchedule() {
+    const card = document.getElementById('home-schedule-body');
+    if (!card) return;
+    const todayBks = calGetBookings()
+      .filter(b => calSameDay(b.date, TODAY))
+      .sort((a, b) => a.time.localeCompare(b.time));
+    if (todayBks.length === 0) {
+      card.innerHTML = `<div class="empty"><div class="empty-icon" aria-hidden="true"><i data-lucide="calendar"></i></div><div class="empty-head">Your day is clear</div><p class="empty-body">No meetings today. Create an event type and share your link to start receiving bookings.</p></div>`;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+    const fmt = t => { const [hh, mm] = t.split(':').map(Number); const ampm = hh >= 12 ? 'PM' : 'AM'; const dh = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh; return `${dh}:${String(mm).padStart(2,'0')} ${ampm}`; };
+    card.innerHTML = todayBks.map(b => {
+      const [h, m] = b.time.split(':').map(Number);
+      const endMin = h * 60 + m + (b.dur || 30);
+      const fmtMin = t => { const hh = Math.floor(t/60), mm = t%60, ampm = hh >= 12 ? 'PM' : 'AM', dh = hh===0?12:hh>12?hh-12:hh; return `${dh}:${String(mm).padStart(2,'0')} ${ampm}`; };
+      return `<div class="schedule-item" data-bk-id="${esc(b.id)}">
+        <div class="schedule-item-dot" style="background:${b.color}"></div>
+        <div class="schedule-item-body">
+          <div class="schedule-item-name">${esc(b.name)}</div>
+          <div class="schedule-item-meta">${fmt(b.time)} – ${fmtMin(endMin)} · ${b.dur || 30} min${b.guest ? ' · ' + esc(b.guest) : ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── Home page: Overview stats ── */
+  function renderHomeStats() {
+    const all = calGetBookings();
+    const now = TODAY;
+    const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0,0,0,0);
+    const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23,59,59,999);
+
+    const weekCount = all.filter(b => b.date >= startOfWeek && b.date <= endOfWeek).length;
+    const monthCount = all.filter(b => b.date.getFullYear() === now.getFullYear() && b.date.getMonth() === now.getMonth()).length;
+    const pendingCount = all.filter(b => b.date > now || calSameDay(b.date, now)).length;
+
+    const wEl = document.getElementById('stat-week-val');
+    const mEl = document.getElementById('stat-month-val');
+    const pEl = document.getElementById('stat-pending-val');
+    if (wEl) wEl.textContent = weekCount;
+    if (mEl) mEl.textContent = monthCount;
+    if (pEl) pEl.textContent = pendingCount;
+  }
+
+  /* ── Calendar: assign side-by-side columns to overlapping events ── */
+  function calAssignCols(bookings, SH, EH) {
+    const items = bookings
+      .filter(b => { const [h] = b.time.split(':').map(Number); return h >= SH && h < EH; })
+      .map(b => {
+        const [h, m] = b.time.split(':').map(Number);
+        return { b, start: h * 60 + m, end: h * 60 + m + (b.dur || 30), col: 0, numCols: 1 };
+      })
+      .sort((a, bItem) => a.start - bItem.start);
+    if (items.length === 0) return items;
+    /* Group into overlap clusters */
+    const groups = [];
+    items.forEach(item => {
+      const last = groups[groups.length - 1];
+      if (last && item.start < Math.max(...last.map(e => e.end))) {
+        last.push(item);
+      } else {
+        groups.push([item]);
+      }
+    });
+    /* Within each group, assign columns greedily */
+    groups.forEach(group => {
+      const colEnds = [];
+      group.forEach(item => {
+        let placed = false;
+        for (let c = 0; c < colEnds.length; c++) {
+          if (colEnds[c] <= item.start) { item.col = c; colEnds[c] = item.end; placed = true; break; }
+        }
+        if (!placed) { item.col = colEnds.length; colEnds.push(item.end); }
+      });
+      const numCols = colEnds.length;
+      group.forEach(item => { item.numCols = numCols; });
+    });
+    return items;
+  }
 
   function calGetBookings() {
     const list = [];
@@ -5978,23 +6079,39 @@
     for (let i = 0; i < 7; i++) {
       const d = new Date(ws); d.setDate(d.getDate()+i);
       const isTod = calSameDay(d, TODAY);
-      const col = document.createElement('div');
-      col.className = `cal-week-col${isTod?' today-col':''}`;
-      for (let s = 0; s < SLOTS; s++) { const sl = document.createElement('div'); sl.className='cal-week-slot'; col.appendChild(sl); }
+      const dayCol = document.createElement('div');
+      dayCol.className = `cal-week-col${isTod?' today-col':''}`;
 
-      bookings.filter(b=>calSameDay(b.date,d)).forEach(b => {
-        const [h,m] = b.time.split(':').map(Number);
-        if (h<SH||h>=EH) return;
-        const top = ((h-SH)+m/60)*48;
-        const height = Math.max((b.dur/60)*48, 22);
+      for (let s = 0; s < SLOTS; s++) {
+        const sl = document.createElement('div');
+        sl.className = 'cal-week-slot';
+        sl.title = `Add event at ${SH+s}:00`;
+        sl.addEventListener('click', (function(date, hour) {
+          return function(e) {
+            const frac = e.offsetY / 48;
+            openCalCreateMeeting(new Date(date), { h: hour, m: frac >= 0.5 ? 30 : 0 });
+          };
+        })(new Date(d), SH + s));
+        dayCol.appendChild(sl);
+      }
+
+      calAssignCols(bookings.filter(b => calSameDay(b.date, d)), SH, EH).forEach(({ b, col: colIdx, numCols }) => {
+        const [h, m] = b.time.split(':').map(Number);
+        const top = ((h - SH) + m / 60) * 48;
+        const height = Math.max((b.dur / 60) * 48, 22);
         const ev = document.createElement('div');
         ev.className = 'cal-week-event';
-        ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
+        if (numCols > 1) {
+          const w = 100 / numCols;
+          ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px;left:calc(${colIdx * w}% + 2px);width:calc(${w}% - 4px);right:auto`;
+        } else {
+          ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
+        }
         ev.innerHTML = `<div class="cal-week-event-name">${esc(b.name)}</div><div class="cal-week-event-time">${calFmt(b.time)}${b.guest?' · '+esc(b.guest):''}</div>`;
-        ev.addEventListener('click', () => openCalEventDetail(b));
-        col.appendChild(ev);
+        ev.addEventListener('click', e => { e.stopPropagation(); openCalEventDetail(b); });
+        dayCol.appendChild(ev);
       });
-      body.appendChild(col);
+      body.appendChild(dayCol);
     }
   }
 
@@ -6004,11 +6121,11 @@
     const hdrCount = document.getElementById('cal-day-header-count');
     if (!body) return;
     const d = calState.dayDate;
-    const bookings = calGetBookings().filter(b=>calSameDay(b.date,d));
-    const SH = 7, EH = 21, SLOTS = EH-SH;
+    const bookings = calGetBookings().filter(b => calSameDay(b.date, d));
+    const SH = 7, EH = 21, SLOTS = EH - SH;
 
     if (hdrDate) hdrDate.textContent = `${CAL_DAYS_FULL[d.getDay()]}, ${CAL_MONTHS[d.getMonth()]} ${d.getDate()}`;
-    if (hdrCount) hdrCount.textContent = bookings.length===0?'No bookings':`${bookings.length} booking${bookings.length!==1?'s':''}`;
+    if (hdrCount) hdrCount.textContent = bookings.length === 0 ? 'No bookings' : `${bookings.length} booking${bookings.length !== 1 ? 's' : ''}`;
 
     body.innerHTML = '';
     const tc = document.createElement('div');
@@ -6016,28 +6133,44 @@
     for (let h = SH; h < EH; h++) {
       const lbl = document.createElement('div');
       lbl.className = 'cal-time-label';
-      lbl.textContent = h===12?'12 PM':h>12?`${h-12} PM`:`${h} AM`;
+      lbl.textContent = h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`;
       tc.appendChild(lbl);
     }
     body.appendChild(tc);
 
-    const col = document.createElement('div');
-    col.className = 'cal-day-col';
-    for (let s = 0; s < SLOTS; s++) { const sl = document.createElement('div'); sl.className='cal-day-slot'; col.appendChild(sl); }
+    const dayCol = document.createElement('div');
+    dayCol.className = 'cal-day-col';
 
-    bookings.forEach(b => {
-      const [h,m] = b.time.split(':').map(Number);
-      if (h<SH||h>=EH) return;
-      const top = ((h-SH)+m/60)*48;
-      const height = Math.max((b.dur/60)*48, 44);
+    for (let s = 0; s < SLOTS; s++) {
+      const sl = document.createElement('div');
+      sl.className = 'cal-day-slot';
+      sl.title = `Add event at ${SH + s}:00`;
+      sl.addEventListener('click', (function(date, hour) {
+        return function(e) {
+          const frac = e.offsetY / 48;
+          openCalCreateMeeting(new Date(date), { h: hour, m: frac >= 0.5 ? 30 : 0 });
+        };
+      })(new Date(d), SH + s));
+      dayCol.appendChild(sl);
+    }
+
+    calAssignCols(bookings, SH, EH).forEach(({ b, col: colIdx, numCols }) => {
+      const [h, m] = b.time.split(':').map(Number);
+      const top = ((h - SH) + m / 60) * 48;
+      const height = Math.max((b.dur / 60) * 48, 44);
       const ev = document.createElement('div');
       ev.className = 'cal-day-event';
-      ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
-      ev.innerHTML = `<div class="cal-day-event-name">${esc(b.name)}</div>${b.guest?`<div class="cal-day-event-guest">${esc(b.guest)}</div>`:''}<div class="cal-day-event-meta">${calFmt(b.time)} · ${b.dur} min</div>`;
-      ev.addEventListener('click', () => openCalEventDetail(b));
-      col.appendChild(ev);
+      if (numCols > 1) {
+        const w = 100 / numCols;
+        ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px;left:calc(${colIdx * w}% + 8px);width:calc(${w}% - 16px);right:auto`;
+      } else {
+        ev.style.cssText = `background:${b.color};top:${top}px;height:${height}px`;
+      }
+      ev.innerHTML = `<div class="cal-day-event-name">${esc(b.name)}</div>${b.guest ? `<div class="cal-day-event-guest">${esc(b.guest)}</div>` : ''}<div class="cal-day-event-meta">${calFmt(b.time)} · ${b.dur} min</div>`;
+      ev.addEventListener('click', e => { e.stopPropagation(); openCalEventDetail(b); });
+      dayCol.appendChild(ev);
     });
-    body.appendChild(col);
+    body.appendChild(dayCol);
   }
 
   function calRenderUpcoming() {
@@ -6377,7 +6510,7 @@
 
   let _calCreateState = { date: null, duration: 30, color: '#2D6A4F', invitees: [] };
 
-  function openCalCreateMeeting(date) {
+  function openCalCreateMeeting(date, presetTime) {
     const overlay = document.getElementById('cal-create-overlay');
     if (!overlay) return;
 
@@ -6423,7 +6556,9 @@
           const opt = document.createElement('option');
           opt.value = val;
           opt.textContent = `${displayH}:${String(m).padStart(2,'0')} ${ampm}`;
-          if (h === defaultHour && m === 0) opt.selected = true;
+          const isPreset = presetTime && h === presetTime.h && m === presetTime.m;
+          const isDefault = !presetTime && h === defaultHour && m === 0;
+          if (isPreset || isDefault) opt.selected = true;
           timeSel.appendChild(opt);
         }
       }
@@ -6489,6 +6624,8 @@
     if (invLinkText) invLinkText.textContent = inviteLink;
 
     calRender();
+    renderHomeSchedule();
+    renderHomeStats();
   }
 
   function _ccmAddInvitee(email) {
