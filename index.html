@@ -796,6 +796,8 @@
       .sidebar, .nav-item, .pill, .card, .btn-new-event,
       .create-card, .cl-check, .prog-fill, .toast { transition: none; animation: none; }
       .dd-panel.open { animation: none; }
+      .edit-drawer-panel, .edit-drawer-preview-pane,
+      .edit-drawer-scrim { transition: none; }
     }
 
     /* ════════════════════════════════
@@ -1149,6 +1151,7 @@
     .act-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
     .act-icon.created { background: var(--color-accent-primary-light); color: var(--color-accent-primary); }
     .act-icon.deleted { background: #FEF2F2; color: var(--color-accent-danger); }
+    .act-icon.edited  { background: #EFF6FF; color: #2563EB; }
 
     .act-body { flex: 1; min-width: 0; }
     .act-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 2px; }
@@ -1161,6 +1164,572 @@
       transition: opacity var(--duration-fast);
     }
     .act-more:hover { opacity: 0.7; }
+
+    /* ════════════════════════════════
+       PAGE SYSTEM
+    ════════════════════════════════ */
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    /* ════════════════════════════════
+       EVENT TYPES PAGE
+    ════════════════════════════════ */
+    .etp-wrapper { max-width: 900px; margin: 0 auto; }
+
+    .etp-intro {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .etp-intro-title {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.025em; margin-bottom: 4px;
+    }
+    .etp-intro-sub { font-size: 14px; color: var(--color-text-secondary); }
+
+    .etp-filter-bar {
+      display: flex; align-items: center;
+      gap: var(--space-4); margin-bottom: var(--space-5); flex-wrap: wrap;
+    }
+    .etp-search-wrap {
+      position: relative; flex: 1; min-width: 200px; max-width: 320px;
+    }
+    .etp-search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--color-text-tertiary); pointer-events: none;
+    }
+    .etp-search-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
+    .etp-search {
+      width: 100%;
+      background: var(--color-bg-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 8px var(--space-4) 8px 36px;
+      font-family: var(--font-body);
+      font-size: 13.5px; color: var(--color-text-primary);
+      transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .etp-search:focus {
+      outline: none;
+      border-color: var(--color-accent-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .etp-search::placeholder { color: var(--color-text-tertiary); }
+
+    .etp-tabs {
+      display: flex; gap: 2px;
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 3px;
+    }
+    .etp-tab {
+      padding: 6px 14px; border-radius: var(--radius-full);
+      font-size: 13px; font-weight: 500; color: var(--color-text-secondary);
+      cursor: pointer; white-space: nowrap;
+      border: none; background: transparent;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .etp-tab:hover { color: var(--color-text-primary); }
+    .etp-tab.active {
+      background: var(--color-bg-surface);
+      color: var(--color-text-primary);
+      box-shadow: var(--shadow-xs); font-weight: 600;
+    }
+    .etp-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 18px;
+      background: var(--color-bg-hover); border-radius: var(--radius-full);
+      font-size: 10px; font-weight: 600; padding: 0 5px; margin-left: 4px;
+      color: var(--color-text-secondary);
+    }
+    .etp-tab.active .etp-count {
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+    }
+
+    /* Full event type cards */
+    .et-full-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .et-full-card {
+      display: flex; align-items: stretch; overflow: hidden; cursor: pointer;
+      transition: box-shadow var(--duration-base), transform var(--duration-fast);
+    }
+    .et-full-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .et-full-card.inactive { opacity: 0.55; }
+
+    .etf-bar { width: 5px; min-width: 5px; }
+    .etf-body {
+      flex: 1; padding: var(--space-5);
+      display: flex; align-items: center; gap: var(--space-4);
+    }
+    .etf-icon {
+      width: 46px; height: 46px; min-width: 46px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: white; flex-shrink: 0;
+    }
+    .etf-icon svg { width: 20px; height: 20px; stroke-width: 1.5; }
+    .etf-info { flex: 1; min-width: 0; }
+    .etf-name {
+      font-size: 15px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em; margin-bottom: 3px;
+    }
+    .etf-desc {
+      font-size: 13px; color: var(--color-text-secondary);
+      margin-bottom: var(--space-2);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .etf-badges {
+      display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;
+    }
+    .etf-badge {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      background: var(--color-bg-subtle); border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 11.5px; font-weight: 500; color: var(--color-text-secondary); white-space: nowrap;
+    }
+    .etf-badge svg { width: 11px; height: 11px; stroke-width: 1.5; }
+    .etf-link {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-2);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .etf-right {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding-right: var(--space-2); flex-shrink: 0;
+    }
+    .et-toggle {
+      position: relative; width: 38px; height: 22px;
+      border: none; flex-shrink: 0;
+      background: var(--color-border-strong);
+      border-radius: var(--radius-full); cursor: pointer;
+      transition: background var(--duration-base) var(--ease-out);
+    }
+    .et-toggle.on { background: var(--color-accent-primary); }
+    .et-toggle::after {
+      content: '';
+      position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      background: white; border-radius: var(--radius-full);
+      transition: transform var(--duration-base) var(--ease-out);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .et-toggle.on::after { transform: translateX(16px); }
+    .etf-actions {
+      display: flex; gap: 2px;
+      opacity: 0; transition: opacity var(--duration-fast);
+    }
+    .et-full-card:hover .etf-actions { opacity: 1; }
+
+    .etp-empty {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: var(--space-16) var(--space-6);
+    }
+    .etp-empty-icon {
+      width: 80px; height: 80px;
+      background: var(--color-accent-primary-light);
+      border-radius: var(--radius-xl);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--space-5); color: var(--color-accent-primary);
+    }
+    .etp-empty-icon svg { width: 36px; height: 36px; stroke-width: 1.5; }
+    .etp-empty-title {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 600; color: var(--color-text-primary);
+      letter-spacing: -0.02em; margin-bottom: var(--space-2);
+    }
+    .etp-empty-sub {
+      font-size: 14px; color: var(--color-text-secondary);
+      line-height: 1.6; max-width: 320px; margin-bottom: var(--space-6);
+    }
+    .etp-create-card {
+      border: 1.5px dashed var(--color-border-strong);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-6);
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-3); font-size: 14px; font-weight: 500;
+      color: var(--color-text-secondary); cursor: pointer;
+      transition: background var(--duration-fast), color var(--duration-fast),
+                  border-color var(--duration-fast), transform var(--duration-fast);
+    }
+    .etp-create-card:hover {
+      background: var(--color-bg-subtle);
+      color: var(--color-accent-primary);
+      border-color: var(--color-accent-primary);
+    }
+    .etp-create-card:active { transform: scale(0.99); }
+    .etp-create-card svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .etp-no-results {
+      text-align: center; padding: var(--space-10) var(--space-6);
+      color: var(--color-text-secondary); font-size: 14px;
+    }
+
+    /* ── Edit modal: location dropdown ── */
+    .em-loc-dropdown { position: relative; }
+    .em-loc-trigger {
+      width: 100%; display: flex; align-items: center; gap: var(--space-3);
+      padding: 10px var(--space-4);
+      background: var(--color-bg-base);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-body); font-size: 14px;
+      color: var(--color-text-primary); cursor: pointer; text-align: left;
+      transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .em-loc-trigger:hover { border-color: var(--color-border-strong); }
+    .em-loc-trigger[aria-expanded="true"] {
+      border-color: var(--color-accent-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .em-loc-trigger-icon {
+      width: 28px; height: 28px; background: var(--color-bg-subtle);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); flex-shrink: 0;
+    }
+    .em-loc-trigger-icon svg { width: 14px; height: 14px; }
+    .em-loc-trigger-label { flex: 1; }
+    .em-loc-chevron {
+      width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0;
+      transition: transform var(--duration-fast);
+    }
+    .em-loc-trigger[aria-expanded="true"] .em-loc-chevron { transform: rotate(180deg); }
+
+    .em-loc-panel {
+      position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 500;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: var(--space-2) 0;
+      display: none; max-height: 280px; overflow-y: auto; scrollbar-width: thin;
+    }
+    .em-loc-panel.open { display: block; animation: stepSlideIn 140ms var(--ease-out) both; }
+
+    .em-loc-group-label {
+      padding: var(--space-2) var(--space-4);
+      font-size: 10.5px; font-weight: 700;
+      color: var(--color-text-tertiary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .em-loc-divider { height: 1px; background: var(--color-border); margin: var(--space-1) 0; }
+    .em-loc-dd-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: 9px var(--space-4); cursor: pointer;
+      transition: background var(--duration-fast);
+      font-size: 14px; color: var(--color-text-primary);
+    }
+    .em-loc-dd-item:hover { background: var(--color-bg-subtle); }
+    .em-loc-dd-item.selected { background: var(--color-accent-primary-light); color: var(--color-accent-primary); }
+    .em-loc-item-icon {
+      width: 30px; height: 30px; border-radius: var(--radius-sm);
+      background: var(--color-bg-subtle);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); flex-shrink: 0;
+    }
+    .em-loc-item-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
+    .em-loc-dd-item.selected .em-loc-item-icon { background: var(--color-accent-primary); color: white; }
+    .em-loc-item-label { flex: 1; }
+    .em-loc-item-check {
+      width: 14px; height: 14px; color: var(--color-accent-primary);
+      flex-shrink: 0; opacity: 0; transition: opacity var(--duration-fast);
+    }
+    .em-loc-dd-item.selected .em-loc-item-check { opacity: 1; }
+
+    /* ════════════════════════════════
+       EDIT EVENT TYPE DRAWER
+    ════════════════════════════════ */
+
+    /* Overlay shell */
+    .edit-drawer-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      pointer-events: none;
+    }
+    .edit-drawer-overlay.open { pointer-events: all; }
+
+    /* Scrim */
+    .edit-drawer-scrim {
+      position: absolute; inset: 0;
+      background: rgba(26,25,22,0.48);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      opacity: 0;
+      transition: opacity var(--duration-slow) var(--ease-out);
+      cursor: pointer;
+    }
+    .edit-drawer-overlay.open .edit-drawer-scrim { opacity: 1; }
+
+    /* Wrap: flex row, pinned to right edge */
+    .edit-drawer-wrap {
+      position: absolute; top: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: row; align-items: stretch;
+    }
+
+    /* ── Edit panel (right, always visible when open) ── */
+    .edit-drawer-panel {
+      width: 460px; min-width: 460px; height: 100%;
+      background: var(--color-bg-surface);
+      display: flex; flex-direction: column;
+      box-shadow: -12px 0 48px rgba(26,25,22,0.11), -1px 0 0 var(--color-border);
+      transform: translateX(100%);
+      transition: transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative; z-index: 2;
+    }
+    .edit-drawer-overlay.open .edit-drawer-panel {
+      transform: translateX(0);
+    }
+
+    /* ── Preview pane (left, collapsible) ── */
+    .edit-drawer-preview-pane {
+      width: 0; min-width: 0; height: 100%; overflow: hidden;
+      background: var(--color-bg-base);
+      display: flex; flex-direction: column;
+      transform: translateX(460px);
+      opacity: 0;
+      transition:
+        width var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1),
+        transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 200ms var(--ease-out) 60ms;
+    }
+    .edit-drawer-overlay.open .edit-drawer-preview-pane {
+      transform: translateX(0);
+    }
+    .edit-drawer-overlay.open.preview-open .edit-drawer-preview-pane {
+      width: 500px; min-width: 500px;
+      opacity: 1;
+    }
+
+    /* Inner container keeps min-width so content renders during animation */
+    .edp-inner {
+      min-width: 500px; height: 100%;
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--color-border);
+    }
+
+    /* Preview pane top bar */
+    .edp-topbar {
+      height: var(--topbar-h); min-height: var(--topbar-h);
+      padding: 0 var(--space-5);
+      background: var(--color-bg-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .edp-color-dot {
+      width: 11px; height: 11px; min-width: 11px;
+      border-radius: var(--radius-full);
+    }
+    .edp-topbar-name {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1; min-width: 0;
+    }
+    .edp-topbar-tag {
+      font-size: 11px; font-weight: 500;
+      color: var(--color-text-tertiary);
+      background: var(--color-bg-subtle);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 2px 8px; white-space: nowrap;
+    }
+
+    /* Fake browser chrome */
+    .edp-browser-chrome {
+      padding: 8px var(--space-5);
+      background: var(--color-bg-subtle);
+      border-bottom: 1px solid var(--color-border);
+      display: flex; align-items: center; gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .edp-browser-dots { display: flex; gap: 5px; flex-shrink: 0; }
+    .edp-browser-dot {
+      width: 9px; height: 9px; border-radius: var(--radius-full);
+    }
+    .edp-browser-url-bar {
+      flex: 1; background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 5px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--color-text-secondary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Info banner */
+    .edp-info-banner {
+      background: hsl(218, 30%, 14%);
+      padding: 10px var(--space-5);
+      display: flex; align-items: flex-start; gap: var(--space-2);
+      font-size: 12px; line-height: 1.55;
+      color: rgba(255,255,255,0.75);
+      flex-shrink: 0;
+    }
+    .edp-info-banner svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+    .edp-info-banner strong { color: rgba(255,255,255,0.95); font-weight: 600; }
+
+    /* Scrollable content */
+    .edp-preview-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: var(--space-6);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .edp-preview-scroll::-webkit-scrollbar { width: 5px; }
+    .edp-preview-scroll::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    /* Booking card */
+    .edp-booking-card {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden; margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-sm);
+    }
+    .edp-booking-accent { height: 5px; }
+    .edp-booking-body { padding: var(--space-5) var(--space-6); }
+    .edp-booking-host {
+      font-size: 13px; color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+    }
+    .edp-booking-name-row {
+      display: flex; align-items: center; gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    .edp-booking-icon {
+      width: 42px; height: 42px; min-width: 42px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: white; flex-shrink: 0;
+    }
+    .edp-booking-icon svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .edp-booking-ev-name {
+      font-family: var(--font-display);
+      font-size: 21px; font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.025em; line-height: 1.2;
+    }
+    .edp-booking-ev-desc {
+      font-size: 13px; color: var(--color-text-secondary);
+      line-height: 1.55; margin-bottom: var(--space-4);
+      min-height: 0;
+    }
+    .edp-booking-divider { height: 1px; background: var(--color-border); margin: var(--space-3) 0 var(--space-4); }
+    .edp-booking-detail {
+      display: flex; align-items: center; gap: var(--space-3);
+      font-size: 13.5px; color: var(--color-text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .edp-booking-detail:last-child { margin-bottom: 0; }
+    .edp-detail-icon {
+      width: 30px; height: 30px; border-radius: var(--radius-sm);
+      background: var(--color-bg-subtle);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .edp-detail-icon svg { width: 14px; height: 14px; stroke-width: 1.5; color: var(--color-text-secondary); }
+
+    /* No availability placeholder */
+    .edp-no-avail {
+      text-align: center;
+      padding: var(--space-8) var(--space-6);
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+    .edp-no-avail-title {
+      font-family: var(--font-display);
+      font-size: 16px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em; margin-bottom: var(--space-2);
+    }
+    .edp-no-avail-body {
+      font-size: 13px; color: var(--color-text-secondary); line-height: 1.55;
+    }
+
+    /* Bottom link row */
+    .edp-link-row {
+      padding: var(--space-3) var(--space-5);
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-surface);
+      display: flex; align-items: center; gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .edp-link-text {
+      font-family: var(--font-mono); font-size: 11.5px;
+      color: var(--color-text-tertiary); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .edp-copy-link {
+      font-size: 12px; font-weight: 600;
+      color: var(--color-accent-primary);
+      background: none; border: none; cursor: pointer;
+      padding: 5px 10px; border-radius: var(--radius-sm);
+      transition: background var(--duration-fast), color var(--duration-fast);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .edp-copy-link:hover { background: var(--color-accent-primary-light); }
+
+    /* ── Edit drawer header ── */
+    .edit-drawer-header {
+      padding: var(--space-5) var(--space-6) var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .edit-drawer-header-top {
+      display: flex; align-items: center; justify-content: flex-end;
+      margin-bottom: var(--space-3);
+    }
+    .edit-drawer-close {
+      width: 32px; height: 32px;
+      background: var(--color-bg-subtle); border: none;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .edit-drawer-close:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .edit-drawer-close svg { width: 16px; height: 16px; stroke-width: 2; }
+    .edit-drawer-title {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: -0.02em; margin-bottom: 3px;
+    }
+    .edit-drawer-subtitle { font-size: 13px; color: var(--color-text-secondary); }
+
+    /* ── Edit drawer body ── */
+    .edit-drawer-body {
+      flex: 1; overflow-y: auto;
+      padding: var(--space-6);
+      scrollbar-width: thin; scrollbar-color: var(--color-border) transparent;
+    }
+    .edit-drawer-body::-webkit-scrollbar { width: 5px; }
+    .edit-drawer-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+    /* ── Edit drawer footer ── */
+    .edit-drawer-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+      flex-shrink: 0;
+      background: var(--color-bg-surface);
+    }
+
+    /* Preview toggle button */
+    .em-preview-trigger {
+      display: flex; align-items: center; gap: 6px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .em-preview-trigger .icon-eye-off { display: none; }
+    .em-preview-trigger.preview-active .icon-eye     { display: none; }
+    .em-preview-trigger.preview-active .icon-eye-off { display: block; }
   </style>
 </head>
 <body>
@@ -1341,6 +1910,9 @@
 
     <!-- Content -->
     <main class="main-content" id="main" tabindex="-1">
+
+      <!-- ══ HOME PAGE ══ -->
+      <div class="page-view active" id="page-home">
       <div class="dash-grid">
 
         <!-- LEFT COL -->
@@ -1491,6 +2063,51 @@
 
         </div>
       </div>
+      </div><!-- /page-home -->
+
+      <!-- ══ EVENT TYPES PAGE ══ -->
+      <div class="page-view" id="page-event-types">
+        <div class="etp-wrapper">
+
+          <!-- Intro header -->
+          <div class="etp-intro">
+            <div>
+              <div class="etp-intro-title">Event Types</div>
+              <div class="etp-intro-sub">Create and manage your scheduling event types.</div>
+            </div>
+            <button class="btn-new-event" id="etp-new-btn" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+              New Event Type
+            </button>
+          </div>
+
+          <!-- Filter bar -->
+          <div class="etp-filter-bar">
+            <div class="etp-search-wrap">
+              <span class="etp-search-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+              <input class="etp-search" type="search" id="etp-search-input" placeholder="Search event types…" autocomplete="off">
+            </div>
+            <div class="etp-tabs" role="tablist">
+              <button class="etp-tab active" data-filter="all" role="tab" aria-selected="true" type="button">
+                All <span class="etp-count" id="etp-count-all">0</span>
+              </button>
+              <button class="etp-tab" data-filter="active" role="tab" aria-selected="false" type="button">
+                Active <span class="etp-count" id="etp-count-active">0</span>
+              </button>
+              <button class="etp-tab" data-filter="inactive" role="tab" aria-selected="false" type="button">
+                Archived <span class="etp-count" id="etp-count-inactive">0</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic list rendered by JS -->
+          <div id="etp-list-container"></div>
+
+        </div>
+      </div><!-- /page-event-types -->
+
     </main>
   </div>
 </div>
@@ -1671,6 +2288,240 @@
   </div>
 </div>
 
+<!-- ════ EDIT EVENT TYPE DRAWER ════ -->
+<div class="edit-drawer-overlay" id="edit-event-modal" role="dialog" aria-modal="true" aria-labelledby="em-modal-title">
+
+  <div class="edit-drawer-scrim" id="edit-drawer-scrim"></div>
+
+  <div class="edit-drawer-wrap">
+
+    <!-- ─── Preview Pane (left side) ─── -->
+    <aside class="edit-drawer-preview-pane" id="edit-preview-pane" aria-label="Booking page preview">
+      <div class="edp-inner">
+
+        <!-- Top bar: color dot + event name -->
+        <div class="edp-topbar">
+          <div class="edp-color-dot" id="edp-color-dot" style="background:#2D6A4F"></div>
+          <div class="edp-topbar-name" id="edp-topbar-name">Event name</div>
+          <span class="edp-topbar-tag">Preview</span>
+        </div>
+
+        <!-- Fake browser chrome -->
+        <div class="edp-browser-chrome">
+          <div class="edp-browser-dots">
+            <div class="edp-browser-dot" style="background:#FF5F57"></div>
+            <div class="edp-browser-dot" style="background:#FEBC2E"></div>
+            <div class="edp-browser-dot" style="background:#28C840"></div>
+          </div>
+          <div class="edp-browser-url-bar" id="edp-url-bar">schedsy.com/jacob/untitled</div>
+        </div>
+
+        <!-- Info banner -->
+        <div class="edp-info-banner">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span><strong>This is a preview.</strong> To book an event, share the link with your invitees.</span>
+        </div>
+
+        <!-- Scrollable booking page preview -->
+        <div class="edp-preview-scroll">
+
+          <div class="edp-booking-card">
+            <div class="edp-booking-accent" id="edp-accent-bar" style="background:#2D6A4F"></div>
+            <div class="edp-booking-body">
+              <div class="edp-booking-host">Jacob Olayinka</div>
+              <div class="edp-booking-name-row">
+                <div class="edp-booking-icon" id="edp-icon" style="background:#2D6A4F">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="edp-booking-ev-name" id="edp-ev-name">Event Name</div>
+              </div>
+              <div class="edp-booking-ev-desc" id="edp-ev-desc"></div>
+              <div class="edp-booking-divider"></div>
+              <div class="edp-booking-detail">
+                <div class="edp-detail-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <span id="edp-dur">30 min</span>
+              </div>
+              <div class="edp-booking-detail">
+                <div class="edp-detail-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <span id="edp-loc">Google Meet</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="edp-no-avail">
+            <div class="edp-no-avail-title">No openings at the moment.</div>
+            <p class="edp-no-avail-body">You haven't configured availability yet. Add working hours to start receiving bookings.</p>
+          </div>
+
+        </div>
+
+        <!-- Bottom link row -->
+        <div class="edp-link-row">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:13px;height:13px;color:var(--color-text-tertiary);flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span class="edp-link-text" id="edp-link-text">schedsy.com/jacob/untitled</span>
+          <button class="edp-copy-link" type="button" id="edp-copy-btn">Copy link</button>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ─── Edit Panel (right side) ─── -->
+    <div class="edit-drawer-panel">
+
+      <div class="edit-drawer-header">
+        <div class="edit-drawer-header-top">
+          <button class="edit-drawer-close" id="edit-modal-close" type="button" aria-label="Close edit drawer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="edit-drawer-title" id="em-modal-title">Edit event type</div>
+        <div class="edit-drawer-subtitle">Update your event type settings.</div>
+      </div>
+
+      <div class="edit-drawer-body">
+
+        <div class="form-field">
+          <label class="form-label" for="em-name">Event name <span style="color:var(--color-accent-danger)">*</span></label>
+          <input class="form-input" type="text" id="em-name" placeholder="e.g. 30 Minute Meeting" maxlength="80" autocomplete="off">
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="em-desc">Description <span style="color:var(--color-text-tertiary);font-weight:400">(optional)</span></label>
+          <textarea class="form-textarea" id="em-desc" placeholder="A quick intro to what this meeting is about…" maxlength="300" rows="3"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Duration</label>
+          <div class="duration-grid">
+            <div class="dur-option em-dur-option" data-dur="15 min">15 min</div>
+            <div class="dur-option em-dur-option" data-dur="30 min">30 min</div>
+            <div class="dur-option em-dur-option" data-dur="45 min">45 min</div>
+            <div class="dur-option em-dur-option" data-dur="60 min">60 min</div>
+            <div class="dur-option em-dur-option" data-dur="90 min">90 min</div>
+            <div class="dur-option em-dur-option" data-dur="Custom">Custom</div>
+          </div>
+          <div class="custom-dur-wrap" id="em-custom-dur-wrap">
+            <input class="form-input" type="number" id="em-custom-dur" min="5" max="480" placeholder="60">
+            <span class="custom-dur-unit">minutes</span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Color</label>
+          <div class="color-swatches">
+            <button class="color-swatch em-color-swatch" data-color="green"  style="background:#2D6A4F" title="Forest Green" aria-label="Forest Green" type="button"></button>
+            <button class="color-swatch em-color-swatch" data-color="blue"   style="background:#2563EB" title="Ocean Blue"   aria-label="Ocean Blue"   type="button"></button>
+            <button class="color-swatch em-color-swatch" data-color="amber"  style="background:#C4702A" title="Warm Amber"   aria-label="Warm Amber"   type="button"></button>
+            <button class="color-swatch em-color-swatch" data-color="purple" style="background:#7C3AED" title="Purple"       aria-label="Purple"       type="button"></button>
+            <button class="color-swatch em-color-swatch" data-color="rose"   style="background:#E11D48" title="Rose"         aria-label="Rose"         type="button"></button>
+            <button class="color-swatch em-color-swatch" data-color="teal"   style="background:#0891B2" title="Teal"         aria-label="Teal"         type="button"></button>
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-bottom:0">
+          <label class="form-label">Location</label>
+          <div class="em-loc-dropdown" id="em-loc-dropdown">
+            <button class="em-loc-trigger" id="em-loc-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <!-- populated by JS -->
+            </button>
+            <div class="em-loc-panel" id="em-loc-panel" role="listbox" aria-label="Location options">
+
+              <div class="em-loc-group-label">Video conferencing</div>
+              <div class="em-loc-dd-item" data-loc="google-meet" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                </div>
+                <span class="em-loc-item-label">Google Meet</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="em-loc-dd-item" data-loc="zoom" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="13" height="10" rx="2"/><polygon points="15 11 21 7 21 17 15 13"/></svg>
+                </div>
+                <span class="em-loc-item-label">Zoom</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+
+              <div class="em-loc-divider"></div>
+              <div class="em-loc-group-label">Phone &amp; In-person</div>
+              <div class="em-loc-dd-item" data-loc="phone" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <span class="em-loc-item-label">Phone call</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="em-loc-dd-item" data-loc="inperson" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <span class="em-loc-item-label">In person</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+
+              <div class="em-loc-divider"></div>
+              <div class="em-loc-group-label">More options</div>
+              <div class="em-loc-dd-item" data-loc="ms-teams" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="14" height="12" rx="2"/><path d="M16 11l6-2v10l-6-2"/></svg>
+                </div>
+                <span class="em-loc-item-label">Microsoft Teams</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="em-loc-dd-item" data-loc="webex" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <span class="em-loc-item-label">Webex</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="em-loc-dd-item" data-loc="gotomeeting" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="em-loc-item-label">Go To Meeting</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="em-loc-dd-item" data-loc="jitsi" role="option" tabindex="0">
+                <div class="em-loc-item-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <span class="em-loc-item-label">Jitsi Video (Global)</span>
+                <svg class="em-loc-item-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="edit-drawer-footer">
+        <button class="btn-ghost em-preview-trigger" id="em-preview-btn" type="button" aria-label="Toggle booking page preview">
+          <!-- Eye (preview hidden) -->
+          <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px;flex-shrink:0"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <!-- Eye-off (preview shown) -->
+          <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px;flex-shrink:0"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          <span id="em-preview-label">Preview</span>
+        </button>
+        <div class="btn-row">
+          <button class="btn-ghost" id="em-cancel-btn" type="button">Cancel</button>
+          <button class="btn-primary" id="em-save-btn" type="button" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Save changes
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
 <script>
 (function () {
 
@@ -1702,7 +2553,11 @@
     { id: 'teal',   hex: '#0891B2' },
   ];
 
-  const LOC_LABELS = { video: 'Video call', phone: 'Phone call', inperson: 'In person', custom: 'Custom' };
+  const LOC_LABELS = {
+    video: 'Video call', phone: 'Phone call', inperson: 'In person', custom: 'Custom',
+    'google-meet': 'Google Meet', zoom: 'Zoom', 'ms-teams': 'Microsoft Teams',
+    webex: 'Webex', gotomeeting: 'Go To Meeting', jitsi: 'Jitsi Video (Global)',
+  };
 
   function getEvents()   { return JSON.parse(localStorage.getItem(EVENTS_KEY)   || '[]'); }
   function getActivity() { return JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]'); }
@@ -1787,7 +2642,7 @@
 
   document.getElementById('scrim').addEventListener('click', closeDropdowns);
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); }
+    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); }
   });
 
   /* ══════════════════════════════════
@@ -1818,7 +2673,20 @@
         const sb = document.querySelector(`.sidebar .nav-item[data-page="${page}"]`);
         if (sb) sb.classList.add('active');
         if (pageTitle) pageTitle.textContent = sb ? sb.dataset.label : label;
-        if (page !== 'home') toast(`${label || page} — coming soon!`, 'info');
+        if (page === 'event-types') {
+          switchPage('event-types');
+          renderEventTypesPage();
+          if (window.lucide) lucide.createIcons();
+        } else if (page === 'home') {
+          switchPage('home');
+        } else {
+          switchPage('home');
+          document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+          const homeItem = document.querySelector('.sidebar .nav-item[data-page="home"]');
+          if (homeItem) homeItem.classList.add('active');
+          if (pageTitle) pageTitle.textContent = 'Home';
+          toast(`${label || page} — coming soon!`, 'info');
+        }
         closeDropdowns();
       });
     });
@@ -1879,11 +2747,38 @@
     upgradeCard.querySelector('.uc-btn').addEventListener('click', e => { e.stopPropagation(); toast('Upgrade flow — coming soon!', 'info'); });
     upgradeCard.addEventListener('keydown', e => { if (e.key === 'Enter') upgradeCard.click(); });
 
+    /* Event Types page — static element setup */
+    document.getElementById('etp-new-btn').addEventListener('click', openEventModal);
+    document.getElementById('etp-search-input').addEventListener('input', e => {
+      etpSearch = e.target.value;
+      renderEventTypesPage();
+    });
+    document.querySelectorAll('.etp-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        etpFilter = tab.dataset.filter;
+        document.querySelectorAll('.etp-tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        renderEventTypesPage();
+      });
+    });
+
     /* Init sub-systems */
     initChecklist();
     initEventModal();
+    initEditModal();
     renderEventTypes();
     renderActivity();
+  }
+
+  /* ── Page switch ── */
+  function switchPage(pageId) {
+    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(`page-${pageId}`);
+    if (target) target.classList.add('active');
   }
 
   /* ── Navigate helper ── */
@@ -1892,8 +2787,21 @@
     const item = document.querySelector(`.sidebar .nav-item[data-page="${page}"]`);
     if (item) item.classList.add('active');
     const pt = document.getElementById('page-title');
-    if (pt) pt.textContent = label;
-    if (page !== 'home') toast(`${label} — coming soon!`, 'info');
+    if (pt) pt.textContent = label || (item ? item.dataset.label : page);
+    if (page === 'event-types') {
+      switchPage('event-types');
+      renderEventTypesPage();
+      if (window.lucide) lucide.createIcons();
+    } else if (page === 'home') {
+      switchPage('home');
+    } else {
+      switchPage('home');
+      document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
+      const homeItem = document.querySelector('.sidebar .nav-item[data-page="home"]');
+      if (homeItem) homeItem.classList.add('active');
+      if (pt) pt.textContent = 'Home';
+      toast(`${label} — coming soon!`, 'info');
+    }
   }
 
   /* ══════════════════════════════════
@@ -2064,6 +2972,7 @@
       pushActivity({ type: 'deleted', text: `Deleted event type <strong>${esc(deleted.name)}</strong>`, ts: Date.now() });
       renderEventTypes();
       renderActivity();
+      renderEventTypesPage();
       toast(`"${deleted.name}" deleted`, 'info');
     });
 
@@ -2097,12 +3006,15 @@
       const item = document.createElement('div');
       item.className = 'act-item';
       const isDeleted = act.type === 'deleted';
+      const isEdited  = act.type === 'edited';
       const iconSvg = isDeleted
         ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`
+        : isEdited
+        ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`
         : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>`;
 
       item.innerHTML = `
-        <div class="act-icon ${isDeleted ? 'deleted' : 'created'}">${iconSvg}</div>
+        <div class="act-icon ${isDeleted ? 'deleted' : isEdited ? 'edited' : 'created'}">${iconSvg}</div>
         <div class="act-body">
           <div class="act-text">${act.text}</div>
           <div class="act-time">${timeAgo(act.ts)}</div>
@@ -2122,8 +3034,199 @@
   }
 
   /* ══════════════════════════════════
+     EVENT TYPES PAGE
+  ══════════════════════════════════ */
+  function renderEventTypesPage() {
+    const container = document.getElementById('etp-list-container');
+    if (!container) return;
+
+    const events = getEvents();
+
+    /* Update tab counts */
+    const allCount      = events.length;
+    const activeCount   = events.filter(e => e.active !== false).length;
+    const inactiveCount = events.filter(e => e.active === false).length;
+    const countAll  = document.getElementById('etp-count-all');
+    const countAct  = document.getElementById('etp-count-active');
+    const countInact = document.getElementById('etp-count-inactive');
+    if (countAll)   countAll.textContent   = allCount;
+    if (countAct)   countAct.textContent   = activeCount;
+    if (countInact) countInact.textContent = inactiveCount;
+
+    /* Filter */
+    let filtered = [...events];
+    if (etpFilter === 'active')   filtered = events.filter(e => e.active !== false);
+    if (etpFilter === 'inactive') filtered = events.filter(e => e.active === false);
+    if (etpSearch.trim()) {
+      const q = etpSearch.toLowerCase();
+      filtered = filtered.filter(e =>
+        e.name.toLowerCase().includes(q) ||
+        (e.description || '').toLowerCase().includes(q)
+      );
+    }
+
+    container.innerHTML = '';
+
+    /* Full empty state */
+    if (events.length === 0) {
+      const wrap = document.createElement('div');
+      wrap.className = 'etp-empty';
+      wrap.innerHTML = `
+        <div class="etp-empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <path d="M9 16l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="etp-empty-title">No event types yet</div>
+        <p class="etp-empty-sub">Create your first event type to start accepting bookings. Share the link with anyone to let them schedule time with you.</p>`;
+      const btn = document.createElement('button');
+      btn.className = 'btn-primary';
+      btn.type = 'button';
+      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> Create event type`;
+      btn.addEventListener('click', openEventModal);
+      wrap.appendChild(btn);
+      container.appendChild(wrap);
+      return;
+    }
+
+    /* No results */
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="etp-no-results">No event types match your ${etpSearch ? 'search' : 'filter'}.</div>`;
+      return;
+    }
+
+    const list = document.createElement('div');
+    list.className = 'et-full-list';
+
+    filtered.forEach(ev => {
+      const realIdx = events.indexOf(ev);
+      list.appendChild(buildEtFullCard(ev, realIdx));
+    });
+
+    /* Dashed create-more row */
+    const addMore = document.createElement('div');
+    addMore.className = 'etp-create-card';
+    addMore.setAttribute('role', 'button');
+    addMore.setAttribute('tabindex', '0');
+    addMore.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>
+      </svg>
+      Create a new event type`;
+    addMore.addEventListener('click', openEventModal);
+    addMore.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); openEventModal(); } });
+    list.appendChild(addMore);
+
+    container.appendChild(list);
+  }
+
+  function buildEtFullCard(ev, idx) {
+    const colorHex = (EVENT_COLORS.find(c => c.id === ev.color) || EVENT_COLORS[0]).hex;
+    const locLabel = LOC_LABELS[ev.location] || 'Video call';
+    const dur      = ev.duration === 'Custom' ? `${ev.customDuration || '?'} min` : ev.duration;
+    const slug     = slugify(ev.name);
+    const isActive = ev.active !== false;
+
+    const card = document.createElement('div');
+    card.className = `card et-full-card${isActive ? '' : ' inactive'}`;
+    card.setAttribute('role', 'article');
+    card.setAttribute('aria-label', ev.name);
+
+    const statusStyle = isActive
+      ? `background:var(--color-accent-primary-light);color:var(--color-accent-primary);border-color:rgba(45,106,79,0.2)`
+      : `background:var(--color-bg-subtle);color:var(--color-text-tertiary);border-color:var(--color-border)`;
+
+    card.innerHTML = `
+      <div class="etf-bar" style="background:${colorHex}"></div>
+      <div class="etf-body">
+        <div class="etf-icon" style="background:${colorHex}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="etf-info">
+          <div class="etf-name">${esc(ev.name)}</div>
+          ${ev.description ? `<div class="etf-desc">${esc(ev.description)}</div>` : ''}
+          <div class="etf-badges">
+            <span class="etf-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${esc(dur)}
+            </span>
+            <span class="etf-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              ${esc(locLabel)}
+            </span>
+            <span class="etf-badge" style="${statusStyle}">
+              ${isActive ? 'Active' : 'Archived'}
+            </span>
+          </div>
+          <div class="etf-link">schedsy.com/jacob/${slug}</div>
+        </div>
+        <div class="etf-right">
+          <button class="et-toggle${isActive ? ' on' : ''}" data-action="toggle" type="button"
+                  title="${isActive ? 'Archive event type' : 'Activate event type'}"
+                  aria-label="${isActive ? 'Archive' : 'Activate'} ${esc(ev.name)}">
+          </button>
+          <div class="etf-actions">
+            <button class="et-action-btn" data-action="copy" title="Copy booking link" aria-label="Copy link" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </button>
+            <button class="et-action-btn danger" data-action="delete" title="Delete" aria-label="Delete ${esc(ev.name)}" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>`;
+
+    card.querySelector('[data-action="toggle"]').addEventListener('click', e => {
+      e.stopPropagation();
+      const evs = getEvents();
+      evs[idx].active = evs[idx].active === false ? true : false;
+      saveEvents(evs);
+      const nowActive = evs[idx].active !== false;
+      toast(`"${ev.name}" ${nowActive ? 'activated' : 'archived'}`, nowActive ? 'success' : 'info');
+      renderEventTypesPage();
+      renderEventTypes();
+    });
+
+    card.querySelector('[data-action="copy"]').addEventListener('click', e => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(`schedsy.com/jacob/${slug}`).catch(() => {});
+      toast('Booking link copied!', 'success');
+    });
+
+    card.querySelector('[data-action="delete"]').addEventListener('click', e => {
+      e.stopPropagation();
+      const evs = getEvents();
+      const deleted = evs.splice(idx, 1)[0];
+      saveEvents(evs);
+      pushActivity({ type: 'deleted', text: `Deleted event type <strong>${esc(deleted.name)}</strong>`, ts: Date.now() });
+      toast(`"${deleted.name}" deleted`, 'info');
+      renderEventTypesPage();
+      renderEventTypes();
+      renderActivity();
+    });
+
+    /* Clicking anywhere on the card (not action buttons) opens edit modal */
+    card.addEventListener('click', () => openEditModal(ev, idx));
+
+    return card;
+  }
+
+  /* ══════════════════════════════════
      EVENT CREATION MODAL
   ══════════════════════════════════ */
+  /* ── ET page state ── */
+  let etpFilter = 'all';
+  let etpSearch = '';
+
   let modalStep = 1;
   const TOTAL_STEPS = 3;
   let formData = {};
@@ -2253,8 +3356,8 @@
     document.getElementById('success-name').textContent = newEv.name;
     document.getElementById('modal-success').classList.add('show');
 
-    /* Refresh dashboard in background */
-    setTimeout(() => { renderEventTypes(); renderActivity(); }, 80);
+    /* Refresh dashboard and ET page */
+    setTimeout(() => { renderEventTypes(); renderActivity(); renderEventTypesPage(); }, 80);
 
     /* Toast + auto-close */
     setTimeout(() => toast(`"${newEv.name}" is now live!`, 'success'), 350);
@@ -2329,6 +3432,294 @@
       const link = document.getElementById('review-link').textContent;
       navigator.clipboard.writeText(link).catch(() => {});
       toast('Link copied!', 'success');
+    });
+  }
+
+  /* ══════════════════════════════════
+     EDIT EVENT TYPE MODAL
+  ══════════════════════════════════ */
+  let editEventIdx  = null;
+  let editFormData  = {};
+  let editLocOpen   = false;
+
+  const EDIT_LOC_OPTIONS = [
+    { id: 'google-meet', label: 'Google Meet' },
+    { id: 'zoom',        label: 'Zoom' },
+    { id: 'phone',       label: 'Phone call' },
+    { id: 'inperson',    label: 'In person' },
+    { id: 'ms-teams',    label: 'Microsoft Teams' },
+    { id: 'webex',       label: 'Webex' },
+    { id: 'gotomeeting', label: 'Go To Meeting' },
+    { id: 'jitsi',       label: 'Jitsi Video (Global)' },
+  ];
+
+  /* Map legacy 'video' / 'custom' to specific options */
+  function normalizeLocation(loc) {
+    if (loc === 'video')  return 'google-meet';
+    if (loc === 'custom') return 'inperson';
+    const known = EDIT_LOC_OPTIONS.find(o => o.id === loc);
+    return known ? loc : 'google-meet';
+  }
+
+  function getEditLocLabel(loc) {
+    const opt = EDIT_LOC_OPTIONS.find(o => o.id === loc);
+    return opt ? opt.label : (LOC_LABELS[loc] || 'Video call');
+  }
+
+  function getLocIconSvg(loc) {
+    if (loc === 'phone')    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.72a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+    if (loc === 'inperson') return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    /* video-style icon for all conference platforms */
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+  }
+
+  function updateEditLocTrigger() {
+    const trigger = document.getElementById('em-loc-trigger');
+    const label   = getEditLocLabel(editFormData.location);
+    const iconSvg = getLocIconSvg(editFormData.location);
+    trigger.innerHTML = `
+      <span class="em-loc-trigger-icon">${iconSvg}</span>
+      <span class="em-loc-trigger-label">${esc(label)}</span>
+      <svg class="em-loc-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>`;
+  }
+
+  function updateEditLocPanel() {
+    document.querySelectorAll('.em-loc-dd-item').forEach(item => {
+      item.classList.toggle('selected', item.dataset.loc === editFormData.location);
+    });
+  }
+
+  function openEditLocDropdown() {
+    editLocOpen = true;
+    document.getElementById('em-loc-panel').classList.add('open');
+    document.getElementById('em-loc-trigger').setAttribute('aria-expanded', 'true');
+    updateEditLocPanel();
+  }
+
+  function closeEditLocDropdown() {
+    if (!editLocOpen) return;
+    editLocOpen = false;
+    document.getElementById('em-loc-panel').classList.remove('open');
+    document.getElementById('em-loc-trigger').setAttribute('aria-expanded', 'false');
+  }
+
+  function validateEditModal() {
+    document.getElementById('em-save-btn').disabled = !editFormData.name.trim();
+  }
+
+  function openEditModal(ev, idx) {
+    editEventIdx = idx;
+    editFormData = {
+      name:           ev.name          || '',
+      description:    ev.description   || '',
+      duration:       ev.duration      || '30 min',
+      customDuration: ev.customDuration|| '',
+      color:          ev.color         || 'green',
+      location:       normalizeLocation(ev.location),
+    };
+
+    document.getElementById('em-name').value = editFormData.name;
+    document.getElementById('em-desc').value = editFormData.description;
+
+    /* Duration */
+    document.querySelectorAll('.em-dur-option').forEach(o => {
+      o.classList.toggle('selected', o.dataset.dur === editFormData.duration);
+    });
+    const durWrap = document.getElementById('em-custom-dur-wrap');
+    if (editFormData.duration === 'Custom') {
+      durWrap.classList.add('show');
+      document.getElementById('em-custom-dur').value = editFormData.customDuration || '';
+    } else {
+      durWrap.classList.remove('show');
+    }
+
+    /* Color */
+    document.querySelectorAll('.em-color-swatch').forEach(s => {
+      s.classList.toggle('selected', s.dataset.color === editFormData.color);
+    });
+
+    /* Location trigger */
+    updateEditLocTrigger();
+    closeEditLocDropdown();
+
+    validateEditModal();
+    previewPaneOpen = false;
+    const overlay = document.getElementById('edit-event-modal');
+    overlay.classList.remove('preview-open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('em-name').focus(), 300);
+  }
+
+  let previewPaneOpen = false;
+
+  function closeEditModal() {
+    const overlay = document.getElementById('edit-event-modal');
+    if (!overlay.classList.contains('open')) return;
+    overlay.classList.remove('open');
+    overlay.classList.remove('preview-open');
+    previewPaneOpen = false;
+    const btn = document.getElementById('em-preview-btn');
+    if (btn) {
+      btn.classList.remove('preview-active');
+      document.getElementById('em-preview-label').textContent = 'Preview';
+    }
+    document.body.style.overflow = '';
+    closeEditLocDropdown();
+  }
+
+  function refreshPreview() {
+    const colorHex = (EVENT_COLORS.find(c => c.id === editFormData.color) || EVENT_COLORS[0]).hex;
+    const dur      = editFormData.duration === 'Custom'
+      ? `${editFormData.customDuration || '?'} min`
+      : editFormData.duration;
+    const locLabel = getEditLocLabel(editFormData.location);
+    const slug     = slugify(editFormData.name || 'untitled');
+    const url      = `schedsy.com/jacob/${slug}`;
+
+    document.getElementById('edp-color-dot').style.background   = colorHex;
+    document.getElementById('edp-accent-bar').style.background  = colorHex;
+    document.getElementById('edp-icon').style.background        = colorHex;
+    document.getElementById('edp-topbar-name').textContent      = editFormData.name || 'Untitled';
+    document.getElementById('edp-ev-name').textContent          = editFormData.name || 'Untitled';
+    document.getElementById('edp-ev-desc').textContent          = editFormData.description || '';
+    document.getElementById('edp-dur').textContent              = dur;
+    document.getElementById('edp-loc').textContent              = locLabel;
+    document.getElementById('edp-url-bar').textContent          = url;
+    document.getElementById('edp-link-text').textContent        = url;
+  }
+
+  function togglePreviewPane() {
+    const overlay = document.getElementById('edit-event-modal');
+    const btn     = document.getElementById('em-preview-btn');
+    const label   = document.getElementById('em-preview-label');
+    previewPaneOpen = !previewPaneOpen;
+
+    if (previewPaneOpen) {
+      refreshPreview();
+      overlay.classList.add('preview-open');
+      btn.classList.add('preview-active');
+      label.textContent = 'Hide preview';
+    } else {
+      overlay.classList.remove('preview-open');
+      btn.classList.remove('preview-active');
+      label.textContent = 'Preview';
+    }
+  }
+
+  function saveEditEvent() {
+    if (!editFormData.name.trim()) return;
+    const evs     = getEvents();
+    const old     = evs[editEventIdx];
+    evs[editEventIdx] = {
+      ...old,
+      name:           editFormData.name.trim(),
+      description:    editFormData.description.trim(),
+      duration:       editFormData.duration,
+      customDuration: editFormData.customDuration,
+      color:          editFormData.color,
+      location:       editFormData.location,
+    };
+    saveEvents(evs);
+    pushActivity({
+      type: 'edited',
+      text: `Updated event type <strong>${esc(evs[editEventIdx].name)}</strong>`,
+      ts:   Date.now(),
+    });
+    closeEditModal();
+    renderEventTypes();
+    renderEventTypesPage();
+    renderActivity();
+    toast(`"${evs[editEventIdx].name}" updated`, 'success');
+  }
+
+  function initEditModal() {
+    /* Close / Cancel */
+    document.getElementById('edit-modal-close').addEventListener('click', closeEditModal);
+    document.getElementById('em-cancel-btn').addEventListener('click', closeEditModal);
+    document.getElementById('edit-drawer-scrim').addEventListener('click', closeEditModal);
+
+    /* Save */
+    document.getElementById('em-save-btn').addEventListener('click', saveEditEvent);
+
+    /* Preview toggle */
+    document.getElementById('em-preview-btn').addEventListener('click', togglePreviewPane);
+
+    /* Copy link in preview pane */
+    document.getElementById('edp-copy-btn').addEventListener('click', () => {
+      const url = document.getElementById('edp-link-text').textContent;
+      navigator.clipboard.writeText('https://' + url).catch(() => {});
+      toast('Link copied to clipboard', 'success');
+    });
+
+    /* Name */
+    const nameInput = document.getElementById('em-name');
+    nameInput.addEventListener('input', () => {
+      editFormData.name = nameInput.value;
+      validateEditModal();
+      if (previewPaneOpen) refreshPreview();
+    });
+
+    /* Description */
+    document.getElementById('em-desc').addEventListener('input', e => {
+      editFormData.description = e.target.value;
+      if (previewPaneOpen) refreshPreview();
+    });
+
+    /* Duration */
+    document.querySelectorAll('.em-dur-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.em-dur-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        editFormData.duration = opt.dataset.dur;
+        const wrap = document.getElementById('em-custom-dur-wrap');
+        if (editFormData.duration === 'Custom') {
+          wrap.classList.add('show');
+          document.getElementById('em-custom-dur').focus();
+        } else {
+          wrap.classList.remove('show');
+        }
+        if (previewPaneOpen) refreshPreview();
+      });
+    });
+    document.getElementById('em-custom-dur').addEventListener('input', e => {
+      editFormData.customDuration = e.target.value;
+      if (previewPaneOpen) refreshPreview();
+    });
+
+    /* Color */
+    document.querySelectorAll('.em-color-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        document.querySelectorAll('.em-color-swatch').forEach(s => s.classList.remove('selected'));
+        sw.classList.add('selected');
+        editFormData.color = sw.dataset.color;
+        if (previewPaneOpen) refreshPreview();
+      });
+    });
+
+    /* Location dropdown trigger */
+    document.getElementById('em-loc-trigger').addEventListener('click', e => {
+      e.stopPropagation();
+      editLocOpen ? closeEditLocDropdown() : openEditLocDropdown();
+    });
+
+    /* Location dropdown items */
+    document.querySelectorAll('.em-loc-dd-item').forEach(item => {
+      function selectLoc() {
+        editFormData.location = item.dataset.loc;
+        updateEditLocTrigger();
+        updateEditLocPanel();
+        closeEditLocDropdown();
+        if (previewPaneOpen) refreshPreview();
+      }
+      item.addEventListener('click', selectLoc);
+      item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectLoc(); } });
+    });
+
+    /* Close dropdown on outside click */
+    document.addEventListener('click', e => {
+      const dd = document.getElementById('em-loc-dropdown');
+      if (dd && !dd.contains(e.target)) closeEditLocDropdown();
     });
   }
 
