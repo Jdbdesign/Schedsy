@@ -1756,6 +1756,50 @@
     .edp-book-btn svg { width: 16px; height: 16px; stroke-width: 2; }
 
     /* ════════════════════════════════
+       CONFIRMED BOOKING SECTION (edit modal)
+    ════════════════════════════════ */
+    .em-booking-section {
+      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-5);
+    }
+    .em-booking-header {
+      display: flex; align-items: center; gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .em-booking-header-icon {
+      width: 20px; height: 20px; flex-shrink: 0;
+      background: #d1fae5; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .em-booking-header-icon svg { width: 11px; height: 11px; color: #059669; }
+    .em-booking-header-label {
+      font-size: 13px; font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: 0.01em;
+    }
+    .em-booking-card {
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      display: flex; flex-direction: column; gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+    .em-booking-row {
+      display: flex; align-items: baseline; gap: var(--space-2);
+      font-size: 13px;
+    }
+    .em-booking-key {
+      color: var(--color-text-tertiary);
+      min-width: 52px; flex-shrink: 0;
+    }
+    .em-booking-val {
+      color: var(--color-text-primary);
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    /* ════════════════════════════════
        BOOK MEETING MODAL
     ════════════════════════════════ */
     .bm-overlay {
@@ -2713,7 +2757,7 @@
 
           <button class="edp-book-btn" id="edp-book-btn" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
-            Book Meeting
+            <span id="edp-book-btn-text">Book Meeting</span>
           </button>
 
         </div>
@@ -2781,7 +2825,7 @@
           </div>
         </div>
 
-        <div class="form-field" style="margin-bottom:0">
+        <div class="form-field">
           <label class="form-label">Location</label>
           <div class="em-loc-dropdown" id="em-loc-dropdown">
             <button class="em-loc-trigger" id="em-loc-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
@@ -2854,6 +2898,34 @@
               </div>
 
             </div>
+          </div>
+        </div>
+
+        <!-- ── Confirmed booking section (shown after user confirms a booking from preview) ── -->
+        <div class="em-booking-section" id="em-booking-section" style="display:none">
+          <div class="em-booking-header">
+            <div class="em-booking-header-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="em-booking-header-label">Confirmed booking</span>
+          </div>
+          <div class="em-booking-card">
+            <div class="em-booking-row">
+              <span class="em-booking-key">Name</span>
+              <span class="em-booking-val" id="em-booking-name">—</span>
+            </div>
+            <div class="em-booking-row">
+              <span class="em-booking-key">Email</span>
+              <span class="em-booking-val" id="em-booking-email">—</span>
+            </div>
+            <div class="em-booking-row">
+              <span class="em-booking-key">When</span>
+              <span class="em-booking-val" id="em-booking-datetime">—</span>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:0">
+            <label class="form-label" for="em-guest-emails">Guest emails <span style="color:var(--color-text-tertiary);font-weight:400">(optional)</span></label>
+            <textarea class="form-textarea" id="em-guest-emails" placeholder="Add guest emails, separated by commas&#10;e.g. alice@example.com, bob@example.com" rows="3" autocomplete="off"></textarea>
           </div>
         </div>
 
@@ -4042,6 +4114,23 @@
     updateEditLocTrigger();
     closeEditLocDropdown();
 
+    /* Confirmed booking section */
+    const bookingSection = document.getElementById('em-booking-section');
+    if (ev.hasBooking && ev.booking) {
+      const b = ev.booking;
+      document.getElementById('em-booking-name').textContent     = b.name     || '—';
+      document.getElementById('em-booking-email').textContent    = b.email    || '—';
+      document.getElementById('em-booking-datetime').textContent = b.dateStr  ? `${b.dateStr} · ${b.time}` : '—';
+      document.getElementById('em-guest-emails').value           = b.guestEmails || '';
+      bookingSection.style.display = '';
+      editFormData.hasBooking  = true;
+      editFormData.guestEmails = b.guestEmails || '';
+    } else {
+      bookingSection.style.display = 'none';
+      editFormData.hasBooking  = false;
+      editFormData.guestEmails = '';
+    }
+
     validateEditModal();
     previewPaneOpen = false;
     const overlay = document.getElementById('edit-event-modal');
@@ -4087,6 +4176,10 @@
     document.getElementById('edp-loc').textContent              = locLabel;
     document.getElementById('edp-url-bar').textContent          = url;
     document.getElementById('edp-link-text').textContent        = url;
+
+    /* Update preview button label based on whether a booking has been confirmed */
+    document.getElementById('edp-book-btn-text').textContent =
+      editFormData.hasBooking ? 'Edit Meeting' : 'Book Meeting';
   }
 
   function togglePreviewPane() {
@@ -4111,6 +4204,14 @@
     if (!editFormData.name.trim()) return;
     const evs     = getEvents();
     const old     = evs[editEventIdx];
+
+    /* If a booking exists, persist the potentially-edited guest emails */
+    let updatedBooking = old.booking;
+    if (old.hasBooking && old.booking) {
+      const guestEmailsEl = document.getElementById('em-guest-emails');
+      updatedBooking = { ...old.booking, guestEmails: guestEmailsEl ? guestEmailsEl.value.trim() : old.booking.guestEmails };
+    }
+
     evs[editEventIdx] = {
       ...old,
       name:           editFormData.name.trim(),
@@ -4119,6 +4220,8 @@
       customDuration: editFormData.customDuration,
       color:          editFormData.color,
       location:       editFormData.location,
+      hasBooking:     old.hasBooking || false,
+      booking:        updatedBooking,
     };
     saveEvents(evs);
     pushActivity({
@@ -4221,6 +4324,11 @@
       const dd = document.getElementById('em-loc-dropdown');
       if (dd && !dd.contains(e.target)) closeEditLocDropdown();
     });
+
+    /* Guest emails (confirmed booking section) */
+    document.getElementById('em-guest-emails').addEventListener('input', e => {
+      editFormData.guestEmails = e.target.value;
+    });
   }
 
   /* ══════════════════════════════════
@@ -4248,6 +4356,7 @@
     year: 0, month: 0,
     selectedDay: null,
     selectedTime: null,
+    confirmedEvIdx: null,
   };
 
   function openBookMeetingModal(ev) {
@@ -4421,8 +4530,10 @@
   }
 
   function bmSubmit() {
-    const name   = document.getElementById('bm-name').value.trim();
-    const email  = document.getElementById('bm-email').value.trim();
+    const name        = document.getElementById('bm-name').value.trim();
+    const email       = document.getElementById('bm-email').value.trim();
+    const guestEmails = document.getElementById('bm-guest-emails').value.trim();
+    const notes       = document.getElementById('bm-notes').value.trim();
     const { selectedDay, selectedTime, ev } = bmState;
 
     const dateObj  = new Date(selectedDay.y, selectedDay.m, selectedDay.d);
@@ -4436,6 +4547,17 @@
     document.getElementById('bm-confirm-event').textContent    = ev.name;
     document.getElementById('bm-confirm-datetime').textContent = `${dateStr} · ${selectedTime} (${dur})`;
     document.getElementById('bm-confirm-loc').textContent      = locLabel;
+
+    /* Persist booking data to the event so it surfaces in the edit modal */
+    const evs    = getEvents();
+    const evIdx  = evs.findIndex(e => e.id === ev.id);
+    if (evIdx !== -1) {
+      evs[evIdx].hasBooking = true;
+      evs[evIdx].booking    = { name, email, guestEmails, notes, dateStr, time: selectedTime };
+      saveEvents(evs);
+      bmState.ev            = evs[evIdx];
+      bmState.confirmedEvIdx = evIdx;
+    }
 
     /* Show success */
     document.getElementById('bm-success-overlay').classList.add('show');
@@ -4481,7 +4603,18 @@
     });
 
     document.getElementById('bm-submit-btn').addEventListener('click', bmSubmit);
-    document.getElementById('bm-done-btn').addEventListener('click', closeBookMeetingModal);
+    document.getElementById('bm-done-btn').addEventListener('click', () => {
+      const confirmedIdx = bmState.confirmedEvIdx;
+      closeBookMeetingModal();
+      if (confirmedIdx !== null && confirmedIdx !== undefined) {
+        const evs = getEvents();
+        const ev  = evs[confirmedIdx];
+        if (ev) {
+          setTimeout(() => openEditModal(ev, confirmedIdx), 150);
+        }
+        bmState.confirmedEvIdx = null;
+      }
+    });
 
     /* Preview pane "Book Meeting" button */
     document.getElementById('edp-book-btn').addEventListener('click', () => {
