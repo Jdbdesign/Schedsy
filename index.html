@@ -2967,6 +2967,18 @@
     }
     .avail-schedule-card.active .avail-sc-check { opacity: 1; }
     .avail-sc-check svg { width: 9px; height: 9px; stroke-width: 3; color: white; }
+    .avail-schedule-card.active:hover .avail-sc-check { opacity: 0; }
+
+    .avail-sc-delete {
+      width: 26px; height: 26px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      cursor: pointer; background: transparent; border: none; padding: 0;
+      color: var(--color-text-tertiary);
+      opacity: 0; transition: opacity var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
+    }
+    .avail-schedule-card:hover .avail-sc-delete { opacity: 1; }
+    .avail-sc-delete:hover { background: rgba(220,38,38,0.1); color: var(--color-accent-danger); }
+    .avail-sc-delete svg { width: 13px; height: 13px; stroke-width: 2; pointer-events: none; }
 
     /* Right panel */
     .avail-right {
@@ -4656,6 +4668,25 @@
   </div>
 </div>
 
+<!-- ════ AVAILABILITY SCHEDULE DELETE CONFIRM ════ -->
+<div class="cdp-confirm-overlay" id="avail-del-overlay" role="dialog" aria-modal="true" aria-labelledby="avail-del-title">
+  <div class="cdp-confirm-scrim" id="avail-del-scrim"></div>
+  <div class="cdp-confirm-card">
+    <div class="cdp-confirm-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <div class="cdp-confirm-title" id="avail-del-title">Delete schedule?</div>
+    <p class="cdp-confirm-body"><strong id="avail-del-name"></strong> will be permanently deleted and cannot be recovered.</p>
+    <div class="cdp-confirm-actions">
+      <button class="btn-ghost" id="avail-del-cancel-btn" type="button">Cancel</button>
+      <button class="cdp-confirm-delete-btn" id="avail-del-confirm-btn" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Yes, Delete
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ CALENDAR CREATE MEETING DRAWER ════ -->
 <div class="cal-create-overlay" id="cal-create-overlay" role="dialog" aria-modal="true" aria-labelledby="ccm-heading">
   <div class="cal-create-scrim" id="cal-create-scrim"></div>
@@ -4892,7 +4923,7 @@
 
   document.getElementById('scrim').addEventListener('click', closeDropdowns);
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); closeBookMeetingModal(); closeCalConfirmDelete(); closeCalEventDetail(); closeCalCreateMeeting(); }
+    if (e.key === 'Escape') { closeDropdowns(); closeEventModal(); closeEditModal(); closeBookMeetingModal(); closeCalConfirmDelete(); closeCalEventDetail(); closeCalCreateMeeting(); closeAvailDeleteConfirm(); }
   });
 
   /* ══════════════════════════════════
@@ -5365,6 +5396,20 @@
         </div>
         <span class="avail-sc-check"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
       `;
+      if (availSchedules.length > 1) {
+        const delBtn = document.createElement('button');
+        delBtn.className = 'avail-sc-delete';
+        delBtn.type = 'button';
+        delBtn.title = 'Delete schedule';
+        delBtn.setAttribute('aria-label', `Delete ${sched.name}`);
+        delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+        delBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          openAvailDeleteConfirm(sched.id);
+        });
+        const check = card.querySelector('.avail-sc-check');
+        card.insertBefore(delBtn, check);
+      }
       card.addEventListener('click', () => {
         availActiveId = sched.id;
         availRenderScheduleList();
@@ -5642,10 +5687,51 @@
       toast('Override added', 'success');
     });
 
+    document.getElementById('avail-del-cancel-btn')?.addEventListener('click', closeAvailDeleteConfirm);
+    document.getElementById('avail-del-scrim')?.addEventListener('click', closeAvailDeleteConfirm);
+    document.getElementById('avail-del-confirm-btn')?.addEventListener('click', () => {
+      if (!availDelTargetId) return;
+      const idx = availSchedules.findIndex(s => s.id === availDelTargetId);
+      if (idx === -1) { closeAvailDeleteConfirm(); return; }
+      const deletedName = availSchedules[idx].name;
+      availSchedules.splice(idx, 1);
+      if (availActiveId === availDelTargetId) {
+        availActiveId = availSchedules[0].id;
+        const ni = document.getElementById('avail-name-input');
+        if (ni) ni.value = availSchedules[0].name;
+        const tz = document.getElementById('avail-tz-select');
+        if (tz) tz.value = availSchedules[0].timezone;
+        availRenderHours();
+        availRenderOverrides();
+        if (availCurrentTab === 'preview') availRenderPreview();
+      }
+      closeAvailDeleteConfirm();
+      availRenderScheduleList();
+      toast(`"${deletedName}" deleted`, 'info');
+    });
+
     availRenderHours();
     availRenderMiniCal();
     availRenderOverrides();
     availRenderPreview();
+  }
+
+  let availDelTargetId = null;
+
+  function openAvailDeleteConfirm(schedId) {
+    availDelTargetId = schedId;
+    const sched = availSchedules.find(s => s.id === schedId);
+    if (!sched) return;
+    const nameEl = document.getElementById('avail-del-name');
+    if (nameEl) nameEl.textContent = sched.name;
+    const overlay = document.getElementById('avail-del-overlay');
+    if (overlay) overlay.classList.add('open');
+  }
+
+  function closeAvailDeleteConfirm() {
+    const overlay = document.getElementById('avail-del-overlay');
+    if (overlay) overlay.classList.remove('open');
+    availDelTargetId = null;
   }
 
   /* ══════════════════════════════════
