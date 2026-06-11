@@ -3311,6 +3311,607 @@
     @media (prefers-reduced-motion: reduce) {
       .avail-toggle-label, .avail-toggle-label::after, .avail-time-bar { transition: none; }
     }
+
+    /* ════════════════════════════════
+       PUBLIC LINK / BOOKING FLOW
+    ════════════════════════════════ */
+    .plink-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: #FAFAF8;
+      display: none; flex-direction: column;
+      overflow: hidden;
+    }
+    .plink-overlay.open { display: flex; animation: plinkFadeIn 280ms var(--ease-out) both; }
+    @keyframes plinkFadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .plink-step { display: none; flex: 1; flex-direction: column; overflow-y: auto; }
+    .plink-step.active { display: flex; animation: plinkSlideUp 360ms var(--ease-out) both; }
+    @keyframes plinkSlideUp {
+      from { opacity:0; transform:translateY(18px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* Shared top nav */
+    .plink-topnav {
+      position: absolute; top:0; left:0; right:0; height:56px;
+      display:flex; align-items:center; padding:0 var(--space-6); z-index:10;
+      pointer-events:none;
+    }
+    .plink-topnav > * { pointer-events:all; }
+    .plink-back-btn {
+      display:flex; align-items:center; gap:5px;
+      background:none; border:none;
+      color:var(--color-text-secondary);
+      font-family:var(--font-body); font-size:13px; font-weight:500;
+      cursor:pointer; padding:7px 10px; border-radius:var(--radius-md);
+      transition:color var(--duration-fast), background var(--duration-fast);
+    }
+    .plink-back-btn:hover { color:var(--color-text-primary); background:var(--color-bg-hover); }
+    .plink-back-btn svg { width:15px; height:15px; stroke-width:2.5; }
+
+    /* Brand close badge */
+    .plink-brand-close {
+      position:absolute; top:var(--space-4); right:var(--space-5);
+      display:flex; align-items:center; gap:6px;
+      font-size:11.5px; font-weight:600; color:var(--color-text-tertiary);
+      background:white; border:1px solid var(--color-border);
+      border-radius:var(--radius-full); padding:5px 12px;
+      cursor:pointer; z-index:2001;
+      transition:border-color var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast);
+      user-select:none;
+    }
+    .plink-brand-close:hover { border-color:var(--color-border-strong); color:var(--color-text-primary); box-shadow:var(--shadow-xs); }
+    .plink-brand-close .plk-logo {
+      width:17px; height:17px; background:var(--gradient-brand);
+      border-radius:4px; display:flex; align-items:center; justify-content:center;
+      color:white; font-family:var(--font-display); font-size:9px; font-weight:700;
+    }
+    .plink-brand-close svg { width:12px; height:12px; stroke-width:2.5; opacity:0.45; }
+
+    /* ── STEP 1: PROFILE ── */
+    #plink-step-profile {
+      flex-direction:column;
+      overflow-y:auto;
+      background:#FAFAF8;
+    }
+
+    /* Hero banner */
+    .plink-profile-hero {
+      background:linear-gradient(160deg,#1A3D2B 0%,#2D6A4F 52%,#52B788 100%);
+      padding:56px 28px 48px;
+      display:flex; flex-direction:column; align-items:center;
+      text-align:center; flex-shrink:0; position:relative;
+    }
+    .plink-profile-hero::after {
+      content:''; position:absolute; bottom:-1px; left:0; right:0;
+      height:32px; background:#FAFAF8;
+      border-radius:28px 28px 0 0;
+    }
+
+    .plink-avatar-ring {
+      width:96px; height:96px; border-radius:50%;
+      border:2.5px solid rgba(255,255,255,0.55);
+      background:rgba(255,255,255,0.12);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:18px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.22), 0 0 0 6px rgba(255,255,255,0.07);
+    }
+    .plink-avatar-inner {
+      width:84px; height:84px; border-radius:50%;
+      background:rgba(255,255,255,0.16);
+      display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-display); font-size:30px; font-weight:700;
+      color:white; letter-spacing:-0.02em;
+    }
+    .plink-profile-name {
+      font-family:var(--font-display);
+      font-size:26px; font-weight:700; letter-spacing:-0.03em;
+      color:white; margin-bottom:10px;
+    }
+    .plink-profile-bio {
+      font-size:14px; color:rgba(255,255,255,0.72);
+      line-height:1.72; max-width:370px;
+    }
+    .plink-schedsy-attr {
+      margin-top:22px;
+      display:flex; align-items:center; gap:6px;
+      font-size:11px; color:rgba(255,255,255,0.38); letter-spacing:0.03em;
+    }
+    .plink-schedsy-attr .plk-s-badge {
+      width:14px; height:14px; background:rgba(255,255,255,0.14);
+      border-radius:3px; display:flex; align-items:center; justify-content:center;
+      font-size:8px; font-weight:800; color:rgba(255,255,255,0.5);
+    }
+
+    /* Events section */
+    .plink-profile-events {
+      flex:1; display:flex; flex-direction:column; align-items:center;
+      padding:28px 24px 56px;
+    }
+    .plink-events-hdr {
+      width:100%; max-width:480px; margin-bottom:14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .plink-events-hdr-label {
+      font-size:11px; font-weight:600; letter-spacing:0.07em;
+      text-transform:uppercase; color:var(--color-text-tertiary);
+    }
+    .plink-events-hdr-line {
+      flex:1; height:1px; background:var(--color-border);
+    }
+
+    .plink-event-list { width:100%; max-width:480px; display:flex; flex-direction:column; gap:10px; }
+
+    .plink-event-card {
+      background:white; border:1px solid var(--color-border);
+      border-radius:14px;
+      padding:16px 16px 16px 20px;
+      display:flex; align-items:center; gap:14px;
+      cursor:pointer; text-align:left; overflow:hidden; position:relative;
+      transition:border-color var(--duration-base), box-shadow var(--duration-base), transform var(--duration-fast);
+    }
+    .plink-event-card::before {
+      content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+      background:var(--evclr,#2D6A4F);
+    }
+    .plink-event-card:hover { border-color:var(--evclr,var(--color-border-strong)); box-shadow:0 6px 24px rgba(0,0,0,0.09); transform:translateY(-2px); }
+    .plink-event-card:active { transform:translateY(0) scale(0.998); }
+
+    .plink-ev-dot {
+      width:42px; height:42px; min-width:42px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--evclr-light,var(--color-accent-primary-light));
+      color:var(--evclr,var(--color-accent-primary)); flex-shrink:0;
+    }
+    .plink-ev-dot svg { width:18px; height:18px; stroke-width:1.5; }
+
+    .plink-ev-info { flex:1; min-width:0; }
+    .plink-ev-name {
+      font-family:var(--font-display); font-size:15px; font-weight:600;
+      color:var(--color-text-primary); letter-spacing:-0.01em;
+      margin-bottom:4px;
+    }
+    .plink-ev-meta {
+      display:flex; align-items:center; gap:6px;
+      font-size:12px; color:var(--color-text-secondary);
+    }
+    .plink-ev-meta-dot { width:3px; height:3px; border-radius:50%; background:currentColor; opacity:0.35; flex-shrink:0; }
+
+    .plink-ev-book-btn {
+      flex-shrink:0;
+      padding:8px 16px;
+      background:var(--evclr-light,var(--color-accent-primary-light));
+      color:var(--evclr,var(--color-accent-primary));
+      border-radius:20px;
+      font-size:12.5px; font-weight:600; letter-spacing:-0.01em;
+      white-space:nowrap;
+      transition:background var(--duration-fast), color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .plink-event-card:hover .plink-ev-book-btn {
+      background:var(--evclr,var(--color-accent-primary));
+      color:white;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Single meeting card */
+    .plink-single-meeting-card {
+      width:100%; max-width:480px;
+      background:white; border:1px solid var(--color-border);
+      border-radius:18px; padding:28px 28px 24px;
+      display:flex; flex-direction:column; gap:0;
+      box-shadow:0 2px 16px rgba(0,0,0,0.06);
+    }
+    .plink-smc-title {
+      font-family:var(--font-display); font-size:17px; font-weight:700;
+      color:var(--color-text-primary); letter-spacing:-0.02em;
+      margin-bottom:14px;
+    }
+    .plink-smc-greeting {
+      font-size:15px; font-weight:600; color:var(--color-text-primary);
+      margin-bottom:10px;
+    }
+    .plink-smc-desc {
+      font-size:14px; line-height:1.65; color:var(--color-text-secondary);
+      margin:0 0 14px;
+    }
+    .plink-smc-sign {
+      font-size:13.5px; color:var(--color-text-secondary);
+      font-style:italic; margin:0 0 22px; line-height:1.6;
+    }
+    .plink-smc-book-btn {
+      align-self:flex-start;
+      padding:11px 26px;
+      background:var(--color-accent-primary);
+      color:white; border:none; border-radius:22px;
+      font-size:13.5px; font-weight:600; letter-spacing:-0.01em;
+      cursor:pointer;
+      transition:background var(--duration-fast), box-shadow var(--duration-fast), transform var(--duration-fast);
+    }
+    .plink-smc-book-btn:hover {
+      background:#1f5c3a;
+      box-shadow:0 6px 18px rgba(0,0,0,0.18);
+      transform:translateY(-1px);
+    }
+    .plink-smc-book-btn:active { transform:translateY(0); }
+
+    /* ── STEP 2: DATE/TIME ── */
+    #plink-step-datetime { flex-direction:column; background:#F8F7F4; }
+
+    .plink-dt-wrap {
+      flex:1; display:flex; overflow-y:auto;
+      max-width:980px; width:100%; margin:0 auto;
+      padding:72px var(--space-6) var(--space-8);
+      gap:var(--space-8); align-items:flex-start;
+    }
+    .plink-dt-left {
+      width:268px; min-width:268px; flex-shrink:0;
+      position:sticky; top:0; padding-top:var(--space-2);
+    }
+    .plink-dt-host-row {
+      display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4);
+    }
+    .plink-dt-avatar {
+      width:42px; height:42px; min-width:42px; border-radius:var(--radius-full);
+      background:var(--color-accent-primary-light); color:var(--color-accent-primary);
+      display:flex; align-items:center; justify-content:center;
+      font-family:var(--font-display); font-size:15px; font-weight:700; overflow:hidden;
+    }
+    .plink-dt-host-name { font-size:12.5px; color:var(--color-text-secondary); }
+    .plink-dt-ev-name {
+      font-family:var(--font-display); font-size:21px; font-weight:700;
+      color:var(--color-text-primary); letter-spacing:-0.025em; line-height:1.25;
+      margin-bottom:var(--space-4);
+    }
+    .plink-dt-meta { display:flex; flex-direction:column; gap:8px; margin-bottom:var(--space-4); }
+    .plink-dt-meta-row {
+      display:flex; align-items:center; gap:var(--space-2);
+      font-size:13px; color:var(--color-text-secondary);
+    }
+    .plink-dt-meta-icon {
+      width:22px; height:22px; background:var(--color-bg-hover);
+      border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .plink-dt-meta-icon svg { width:11px; height:11px; stroke-width:1.5; color:var(--color-text-secondary); }
+    .plink-dt-divider { height:1px; background:var(--color-border); margin:var(--space-4) 0; }
+    .plink-dt-desc { font-size:12.5px; color:var(--color-text-secondary); line-height:1.65; }
+
+    .plink-sel-time-badge {
+      display:none; align-items:center; gap:var(--space-2);
+      background:var(--color-accent-primary-light); border:1px solid rgba(45,106,79,0.2);
+      border-radius:var(--radius-md);
+      padding:9px var(--space-4); margin-top:var(--space-4);
+      font-size:13px; font-weight:600; color:var(--color-accent-primary);
+    }
+    .plink-sel-time-badge.show { display:flex; }
+    .plink-sel-time-badge svg { width:13px; height:13px; stroke-width:1.5; flex-shrink:0; }
+
+    .plink-dt-right {
+      flex:1; min-width:0; background:white;
+      border:1px solid var(--color-border); border-radius:var(--radius-xl);
+      box-shadow:var(--shadow-sm); overflow:hidden; display:flex; flex-direction:column;
+    }
+    .plink-dt-right-hdr {
+      padding:var(--space-5) var(--space-6); border-bottom:1px solid var(--color-border);
+    }
+    .plink-dt-right-title {
+      font-family:var(--font-display); font-size:16px; font-weight:600;
+      color:var(--color-text-primary); letter-spacing:-0.02em;
+    }
+    .plink-dt-right-sub { font-size:12px; color:var(--color-text-secondary); margin-top:2px; }
+    .plink-dt-right-body { display:flex; flex:1; overflow:hidden; }
+
+    .plink-cal-pane {
+      flex:1; padding:var(--space-5) var(--space-6); overflow-y:auto;
+    }
+    .plink-month-nav {
+      display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-4);
+    }
+    .plink-month-label {
+      font-family:var(--font-display); font-size:15px; font-weight:600;
+      color:var(--color-text-primary); letter-spacing:-0.01em;
+    }
+    .plink-nav-btn {
+      width:30px; height:30px; background:var(--color-bg-subtle);
+      border:1px solid var(--color-border); border-radius:var(--radius-sm);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--color-text-secondary);
+      transition:background var(--duration-fast), color var(--duration-fast);
+    }
+    .plink-nav-btn:hover { background:var(--color-bg-hover); color:var(--color-text-primary); }
+    .plink-nav-btn:disabled { opacity:0.3; cursor:not-allowed; }
+    .plink-nav-btn svg { width:13px; height:13px; stroke-width:2.5; }
+
+    .plink-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .plink-cal-hdr {
+      text-align:center; padding:5px 0 var(--space-3);
+      font-size:10.5px; font-weight:700; color:var(--color-text-tertiary);
+      text-transform:uppercase; letter-spacing:0.06em;
+    }
+    .plink-cal-day {
+      aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+      border-radius:var(--radius-md); font-size:13px; font-weight:500;
+      cursor:pointer; position:relative;
+      border:1.5px solid transparent; color:var(--color-text-primary);
+      transition:background var(--duration-fast), color var(--duration-fast), transform var(--duration-fast);
+    }
+    .plink-cal-day.available:hover:not(.selected) {
+      background:var(--color-accent-primary-light); color:var(--color-accent-primary);
+      border-color:rgba(45,106,79,0.2);
+    }
+    .plink-cal-day.today:not(.selected) { font-weight:700; color:var(--color-accent-primary); }
+    .plink-cal-day.today:not(.selected)::after {
+      content:''; position:absolute; bottom:3px; left:50%;
+      transform:translateX(-50%); width:4px; height:4px;
+      background:var(--color-accent-primary); border-radius:var(--radius-full);
+    }
+    .plink-cal-day.selected {
+      background:var(--color-accent-primary); color:white;
+      font-weight:600; border-color:var(--color-accent-primary);
+      box-shadow:0 2px 8px rgba(45,106,79,0.35);
+    }
+    .plink-cal-day.unavailable { color:var(--color-text-tertiary); cursor:not-allowed; opacity:0.4; }
+    .plink-cal-day.filler { opacity:0; pointer-events:none; }
+
+    .plink-times-pane {
+      width:0; min-width:0; border-left:1px solid var(--color-border);
+      overflow:hidden;
+      transition:width var(--duration-slow) cubic-bezier(0.16,1,0.3,1),
+                 min-width var(--duration-slow) cubic-bezier(0.16,1,0.3,1);
+    }
+    .plink-times-pane.open { width:176px; min-width:176px; }
+    .plink-times-inner { min-width:176px; display:flex; flex-direction:column; height:100%; }
+    .plink-times-hdr {
+      padding:var(--space-4) var(--space-3) var(--space-3);
+      border-bottom:1px solid var(--color-border); flex-shrink:0;
+    }
+    .plink-times-date { font-size:13px; font-weight:700; color:var(--color-text-primary); letter-spacing:-0.01em; }
+    .plink-times-scroll {
+      flex:1; overflow-y:auto; padding:var(--space-3);
+      display:flex; flex-direction:column; gap:5px;
+      scrollbar-width:thin; scrollbar-color:var(--color-border) transparent;
+    }
+    .plink-time-chip {
+      width:100%; padding:9px var(--space-2);
+      background:transparent; border:1.5px solid var(--color-border);
+      border-radius:var(--radius-md); font-family:var(--font-body);
+      font-size:12.5px; font-weight:500; color:var(--color-text-primary);
+      cursor:pointer; text-align:center;
+      transition:all var(--duration-fast) var(--ease-out);
+    }
+    .plink-time-chip:hover {
+      border-color:var(--color-accent-primary); background:var(--color-accent-primary-light);
+      color:var(--color-accent-primary);
+    }
+    .plink-time-chip.selected {
+      background:var(--color-accent-primary); border-color:var(--color-accent-primary);
+      color:white; font-weight:600;
+    }
+
+    .plink-dt-footer {
+      padding:var(--space-4) var(--space-6);
+      border-top:1px solid var(--color-border); background:white;
+      display:flex; align-items:center; justify-content:space-between; gap:var(--space-3);
+    }
+    .plink-tz-note {
+      display:flex; align-items:center; gap:5px;
+      font-size:11.5px; color:var(--color-text-tertiary);
+    }
+    .plink-tz-note svg { width:12px; height:12px; stroke-width:1.5; }
+    .plink-next-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:9px var(--space-6); background:var(--color-accent-primary);
+      border:none; border-radius:var(--radius-full);
+      font-family:var(--font-body); font-size:14px; font-weight:600;
+      color:white; cursor:pointer;
+      opacity:0; pointer-events:none;
+      transition:opacity var(--duration-base), background var(--duration-fast),
+                 transform var(--duration-fast), box-shadow var(--duration-fast);
+      box-shadow:0 3px 10px rgba(45,106,79,0.3);
+    }
+    .plink-next-btn.show { opacity:1; pointer-events:all; }
+    .plink-next-btn:hover { background:var(--color-accent-primary-hover); box-shadow:0 5px 16px rgba(45,106,79,0.4); }
+    .plink-next-btn:active { transform:scale(0.97); }
+    .plink-next-btn svg { width:14px; height:14px; stroke-width:2.5; }
+
+    /* ── STEP 3: DETAILS ── */
+    #plink-step-details { flex-direction:column; background:#F8F7F4; }
+    .plink-det-wrap {
+      flex:1; display:flex; overflow-y:auto;
+      max-width:980px; width:100%; margin:0 auto;
+      padding:72px var(--space-6) var(--space-8);
+      gap:var(--space-8); align-items:flex-start;
+    }
+    .plink-det-left {
+      width:268px; min-width:268px; flex-shrink:0;
+      position:sticky; top:0; padding-top:var(--space-2);
+    }
+    .plink-sel-card {
+      background:white; border:1px solid var(--color-border);
+      border-radius:var(--radius-lg); padding:var(--space-4) var(--space-5);
+      margin-top:var(--space-5);
+    }
+    .plink-sel-card-label {
+      font-size:10px; font-weight:700; color:var(--color-text-tertiary);
+      text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--space-3);
+    }
+    .plink-sel-card-row {
+      display:flex; align-items:center; gap:var(--space-3);
+      font-size:13px; color:var(--color-text-primary); margin-bottom:8px;
+    }
+    .plink-sel-card-row:last-child { margin-bottom:0; }
+    .plink-sel-card-row svg { width:13px; height:13px; stroke-width:1.5; color:var(--color-text-tertiary); flex-shrink:0; }
+
+    .plink-det-right {
+      flex:1; min-width:0; background:white;
+      border:1px solid var(--color-border); border-radius:var(--radius-xl);
+      box-shadow:var(--shadow-sm); overflow:hidden; display:flex; flex-direction:column;
+    }
+    .plink-det-hdr { padding:var(--space-6); border-bottom:1px solid var(--color-border); }
+    .plink-det-title {
+      font-family:var(--font-display); font-size:19px; font-weight:700;
+      color:var(--color-text-primary); letter-spacing:-0.025em;
+    }
+    .plink-det-subtitle { font-size:12.5px; color:var(--color-text-secondary); margin-top:3px; }
+    .plink-det-body { padding:var(--space-6); flex:1; overflow-y:auto; }
+    .plink-det-field { margin-bottom:var(--space-5); }
+    .plink-det-label {
+      display:block; font-size:13px; font-weight:600;
+      color:var(--color-text-primary); margin-bottom:6px;
+    }
+    .plink-det-label .req { color:var(--color-accent-danger); margin-left:2px; }
+    .plink-det-input, .plink-det-textarea {
+      width:100%; background:var(--color-bg-base);
+      border:1.5px solid var(--color-border); border-radius:var(--radius-md);
+      padding:11px var(--space-4); font-family:var(--font-body);
+      font-size:14px; color:var(--color-text-primary);
+      transition:border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .plink-det-input:focus, .plink-det-textarea:focus {
+      outline:none; border-color:var(--color-accent-primary); box-shadow:var(--shadow-focus);
+    }
+    .plink-det-input::placeholder, .plink-det-textarea::placeholder { color:var(--color-text-tertiary); }
+    .plink-det-textarea { min-height:80px; resize:none; line-height:1.5; }
+
+    .plink-guests-btn {
+      display:flex; align-items:center; gap:6px;
+      font-size:13px; font-weight:500; color:var(--color-accent-primary);
+      background:none; border:none; cursor:pointer; padding:0;
+      margin-bottom:var(--space-4); transition:opacity var(--duration-fast);
+    }
+    .plink-guests-btn:hover { opacity:0.7; }
+    .plink-guests-btn svg { width:14px; height:14px; stroke-width:2; }
+    .plink-guests-box {
+      display:none; margin-bottom:var(--space-4);
+      animation:stepSlideIn var(--duration-base) var(--ease-out) both;
+    }
+    .plink-guests-box.open { display:block; }
+
+    .plink-guest-tags-wrap {
+      display:flex; flex-wrap:wrap; gap:5px; min-height:44px;
+      background:var(--color-bg-base); border:1.5px solid var(--color-border);
+      border-radius:var(--radius-md); padding:7px; cursor:text;
+      transition:border-color var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .plink-guest-tags-wrap:focus-within {
+      border-color:var(--color-accent-primary); box-shadow:var(--shadow-focus);
+    }
+    .plink-guest-tag {
+      display:flex; align-items:center; gap:4px;
+      background:var(--color-accent-primary-light); color:var(--color-accent-primary);
+      border-radius:var(--radius-full); font-size:12px; font-weight:500;
+      padding:3px 8px 3px 10px; white-space:nowrap;
+    }
+    .plink-guest-tag button {
+      background:none; border:none; cursor:pointer; color:var(--color-accent-primary);
+      display:flex; align-items:center; padding:0; opacity:0.6;
+      transition:opacity var(--duration-fast);
+    }
+    .plink-guest-tag button:hover { opacity:1; }
+    .plink-guest-tag button svg { width:10px; height:10px; stroke-width:2.5; }
+    .plink-guest-input {
+      flex:1; min-width:120px; background:none; border:none; outline:none;
+      font-family:var(--font-body); font-size:13px; color:var(--color-text-primary); padding:2px 4px;
+    }
+    .plink-guest-input::placeholder { color:var(--color-text-tertiary); }
+
+    .plink-det-footer {
+      padding:var(--space-5) var(--space-6) var(--space-6);
+      border-top:1px solid var(--color-border);
+    }
+    .plink-schedule-btn {
+      width:100%; padding:13px;
+      background:var(--color-accent-primary); border:none; border-radius:var(--radius-full);
+      font-family:var(--font-body); font-size:15px; font-weight:600; color:white;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+      transition:background var(--duration-fast), transform var(--duration-fast), box-shadow var(--duration-fast);
+      box-shadow:0 4px 14px rgba(45,106,79,0.28);
+    }
+    .plink-schedule-btn:hover { background:var(--color-accent-primary-hover); box-shadow:0 6px 20px rgba(45,106,79,0.38); }
+    .plink-schedule-btn:active { transform:scale(0.98); }
+    .plink-schedule-btn:disabled { opacity:0.38; cursor:not-allowed; transform:none; box-shadow:none; }
+    .plink-schedule-btn svg { width:16px; height:16px; stroke-width:2; }
+    .plink-disclaimer {
+      font-size:11px; color:var(--color-text-tertiary);
+      text-align:center; margin-top:var(--space-3); line-height:1.5;
+    }
+
+    /* ── STEP 4: SUCCESS ── */
+    #plink-step-success {
+      align-items:center; justify-content:center;
+      padding:var(--space-10) var(--space-6);
+      background:
+        radial-gradient(circle at 35% 25%, rgba(45,106,79,0.09) 0%, transparent 55%),
+        #FAFAF8;
+    }
+    .plink-success-inner {
+      width:100%; max-width:460px;
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+    }
+    .plink-success-ring {
+      width:88px; height:88px; border-radius:var(--radius-full);
+      background:var(--color-accent-primary-light);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:var(--space-5);
+      animation:successPop 450ms 80ms cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .plink-success-ring svg { width:40px; height:40px; stroke-width:1.5; color:var(--color-accent-primary); }
+    .plink-success-title {
+      font-family:var(--font-display); font-size:28px; font-weight:700;
+      color:var(--color-text-primary); letter-spacing:-0.03em; margin-bottom:var(--space-2);
+    }
+    .plink-success-body {
+      font-size:14.5px; color:var(--color-text-secondary); line-height:1.65;
+      max-width:380px; margin-bottom:var(--space-8);
+    }
+    .plink-success-card {
+      width:100%; background:white; border:1px solid var(--color-border);
+      border-radius:var(--radius-xl); box-shadow:var(--shadow-md);
+      overflow:hidden; margin-bottom:var(--space-6); text-align:left;
+    }
+    .plink-success-card-hdr {
+      padding:var(--space-3) var(--space-5);
+      background:var(--color-accent-primary-light);
+      border-bottom:1px solid rgba(45,106,79,0.12);
+      display:flex; align-items:center; gap:var(--space-2);
+    }
+    .plink-success-card-hdr svg { width:14px; height:14px; stroke-width:1.5; color:var(--color-accent-primary); }
+    .plink-success-card-hdr-label {
+      font-size:12px; font-weight:600; color:var(--color-accent-primary); letter-spacing:0.01em;
+    }
+    .plink-success-card-body { padding:var(--space-5) var(--space-5) var(--space-4); }
+    .plink-success-row {
+      display:flex; align-items:flex-start; gap:var(--space-3);
+      margin-bottom:var(--space-3);
+    }
+    .plink-success-row:last-child { margin-bottom:0; }
+    .plink-success-row-icon {
+      width:30px; height:30px; border-radius:var(--radius-sm);
+      background:var(--color-bg-subtle); border:1px solid var(--color-border);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .plink-success-row-icon svg { width:13px; height:13px; stroke-width:1.5; color:var(--color-text-secondary); }
+    .plink-success-row-body { flex:1; }
+    .plink-success-row-lbl { font-size:10.5px; color:var(--color-text-tertiary); margin-bottom:1px; font-weight:500; }
+    .plink-success-row-val { font-size:13.5px; font-weight:500; color:var(--color-text-primary); }
+
+    .plink-done-btn {
+      padding:12px 48px; background:var(--color-accent-primary); border:none;
+      border-radius:var(--radius-full); font-family:var(--font-body);
+      font-size:15px; font-weight:600; color:white; cursor:pointer;
+      transition:background var(--duration-fast), transform var(--duration-fast);
+      box-shadow:0 4px 14px rgba(45,106,79,0.28);
+    }
+    .plink-done-btn:hover { background:var(--color-accent-primary-hover); }
+    .plink-done-btn:active { transform:scale(0.97); }
+
+    @media (max-width:700px) {
+      .plink-dt-wrap, .plink-det-wrap { flex-direction:column; padding:72px var(--space-4) var(--space-6); gap:var(--space-5); }
+      .plink-dt-left, .plink-det-left { width:100%; min-width:unset; position:relative; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      .plink-overlay, .plink-step { animation:none; }
+      .plink-times-pane, .plink-next-btn { transition:none; }
+    }
   </style>
 </head>
 <body>
@@ -3508,6 +4109,9 @@
             <div class="welcome-pills">
               <button class="pill" id="copy-link-btn" type="button">
                 <i data-lucide="link"></i> Copy My Link
+              </button>
+              <button class="pill" id="preview-page-btn" type="button">
+                <i data-lucide="eye"></i> Preview Page
               </button>
               <button class="pill" id="view-cal-btn" type="button">
                 <i data-lucide="calendar-days"></i> View Calendar
@@ -5026,6 +5630,7 @@
       navigator.clipboard.writeText('schedsy.com/jacob-olayinka').catch(() => {});
       toast('Booking link copied to clipboard!', 'success');
     });
+    document.getElementById('preview-page-btn').addEventListener('click', () => openPublicLinkPage(null));
     document.getElementById('view-cal-btn').addEventListener('click', () => navigateTo('calendar', 'Calendar'));
     document.getElementById('new-event-pill').addEventListener('click', openEventModal);
     document.getElementById('view-cal-link').addEventListener('click', e => { e.preventDefault(); navigateTo('calendar', 'Calendar'); });
@@ -5063,6 +5668,7 @@
     initEventModal();
     initEditModal();
     initBookMeetingModal();
+    initPublicLinkPage();
     renderEventTypes();
     renderActivity();
     renderHomeSchedule();
@@ -5867,6 +6473,9 @@
         <div class="et-top">
           <div class="et-name">${esc(ev.name)}</div>
           <div class="et-actions">
+            <button class="et-action-btn" data-action="view" title="Preview booking page" aria-label="Preview booking page">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
             <button class="et-action-btn" data-action="copy" title="Copy booking link" aria-label="Copy link">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             </button>
@@ -5887,6 +6496,11 @@
         </div>
         <div class="et-link">schedsy.com/jacob/${slug}</div>
       </div>`;
+
+    card.querySelector('[data-action="view"]').addEventListener('click', e => {
+      e.stopPropagation();
+      openPublicLinkPage(ev);
+    });
 
     card.querySelector('[data-action="copy"]').addEventListener('click', e => {
       e.stopPropagation();
@@ -6105,6 +6719,9 @@
                   aria-label="${isActive ? 'Archive' : 'Activate'} ${esc(ev.name)}">
           </button>
           <div class="etf-actions">
+            <button class="et-action-btn" data-action="view" title="Preview booking page" aria-label="Preview booking page" type="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
             <button class="et-action-btn" data-action="copy" title="Copy booking link" aria-label="Copy link" type="button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             </button>
@@ -6114,6 +6731,11 @@
           </div>
         </div>
       </div>`;
+
+    card.querySelector('[data-action="view"]').addEventListener('click', e => {
+      e.stopPropagation();
+      openPublicLinkPage(ev);
+    });
 
     card.querySelector('[data-action="toggle"]').addEventListener('click', e => {
       e.stopPropagation();
@@ -7899,7 +8521,560 @@
     document.getElementById('ccm-done-btn')?.addEventListener('click', closeCalCreateMeeting);
   }
 
+  /* ══════════════════════════════════
+     PUBLIC LINK / BOOKING FLOW
+  ══════════════════════════════════ */
+
+  let plinkState = {
+    selectedEvent: null,
+    year: 0, month: 0,
+    selectedDay: null,
+    selectedTime: null,
+    guestEmails: [],
+  };
+
+  function openPublicLinkPage(ev) {
+    plinkState.selectedEvent = ev || null;
+    plinkState.selectedDay  = null;
+    plinkState.selectedTime = null;
+    plinkState.guestEmails  = [];
+
+    if (ev) {
+      plinkShowStep('datetime');
+      plinkPopulateDT(ev);
+    } else {
+      plinkShowStep('profile');
+      plinkRenderProfile();
+    }
+
+    document.getElementById('plink-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function closePublicLinkPage() {
+    document.getElementById('plink-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function plinkShowStep(step) {
+    document.querySelectorAll('.plink-step').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('plink-step-' + step);
+    if (el) el.classList.add('active');
+  }
+
+  function plinkRenderProfile() {
+    const events = getEvents();
+    const btn    = document.getElementById('plink-smc-book-btn');
+    if (!btn) return;
+
+    const go = () => {
+      const ev = events[0];
+      if (!ev) return;
+      plinkState.selectedEvent = ev;
+      plinkState.selectedDay   = null;
+      plinkState.selectedTime  = null;
+      plinkPopulateDT(ev);
+      plinkShowStep('datetime');
+      if (window.lucide) lucide.createIcons();
+    };
+    btn.addEventListener('click', go);
+  }
+
+  function plinkPopulateDT(ev) {
+    const dur      = ev.duration === 'Custom' ? `${ev.customDuration || 30} min` : ev.duration;
+    const locLabel = LOC_LABELS[ev.location] || 'Video call';
+
+    ['plink-dt-ev-name',  'plink-det-ev-name' ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ev.name; });
+    ['plink-dt-dur',      'plink-det-dur'      ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = dur; });
+    ['plink-dt-loc',      'plink-det-loc'      ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = locLabel; });
+    ['plink-dt-host-name','plink-det-host-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'Jacob Olayinka'; });
+    ['plink-dt-avatar',   'plink-det-avatar'   ].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = 'JO'; });
+
+    const descEl = document.getElementById('plink-dt-desc');
+    if (descEl) descEl.textContent = ev.description || '';
+
+    document.getElementById('plink-sel-time-badge')?.classList.remove('show');
+    document.getElementById('plink-next-btn')?.classList.remove('show');
+
+    const now = new Date();
+    plinkState.year  = now.getFullYear();
+    plinkState.month = now.getMonth();
+    plinkRenderCalendar();
+    document.getElementById('plink-times-pane')?.classList.remove('open');
+
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local time';
+    const tzEl = document.getElementById('plink-tz-label'); if (tzEl) tzEl.textContent = tz;
+    const tzSub = document.getElementById('plink-dt-right-sub'); if (tzSub) tzSub.textContent = 'All times in ' + tz;
+  }
+
+  function plinkRenderCalendar() {
+    const { year, month, selectedDay } = plinkState;
+    const now    = new Date();
+    const today  = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const mlEl   = document.getElementById('plink-month-label');
+    if (mlEl) mlEl.textContent = MONTH_NAMES[month] + ' ' + year;
+
+    const prevBtn = document.getElementById('plink-prev-month');
+    if (prevBtn) prevBtn.disabled = (year < now.getFullYear()) || (year === now.getFullYear() && month <= now.getMonth());
+
+    const grid = document.getElementById('plink-cal-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    DAY_HDRS.forEach(d => {
+      const h = document.createElement('div');
+      h.className = 'plink-cal-hdr'; h.textContent = d;
+      grid.appendChild(h);
+    });
+
+    const firstDay    = new Date(year, month, 1).getDay();
+    const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < startOffset; i++) {
+      const f = document.createElement('div'); f.className = 'plink-cal-day filler'; grid.appendChild(f);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDate   = new Date(year, month, d);
+      const isToday   = dayDate.getTime() === today.getTime();
+      const isPast    = dayDate < today;
+      const isWeekend = dayDate.getDay() === 0 || dayDate.getDay() === 6;
+      const rng       = seededRand(year * 10000 + month * 100 + d);
+      const hasSlots  = !isPast && !isWeekend && rng() > 0.25;
+      const isSelected = selectedDay && selectedDay.d === d && selectedDay.m === month && selectedDay.y === year;
+
+      const cell = document.createElement('div');
+      cell.className = 'plink-cal-day' +
+        (isToday    ? ' today'     : '') +
+        (isSelected ? ' selected'  : '') +
+        (hasSlots   ? ' available' : ' unavailable');
+      cell.textContent = d;
+      if (hasSlots) cell.addEventListener('click', () => plinkSelectDay(d, month, year, dayDate));
+      grid.appendChild(cell);
+    }
+  }
+
+  function plinkSelectDay(d, m, y, dateObj) {
+    plinkState.selectedDay  = { d, m, y };
+    plinkState.selectedTime = null;
+    plinkRenderCalendar();
+    plinkRenderTimes(dateObj);
+    document.getElementById('plink-next-btn')?.classList.remove('show');
+    document.getElementById('plink-sel-time-badge')?.classList.remove('show');
+  }
+
+  function plinkRenderTimes(dateObj) {
+    const pane   = document.getElementById('plink-times-pane');
+    const scroll = document.getElementById('plink-times-scroll');
+    const dateEl = document.getElementById('plink-times-date');
+    if (!pane || !scroll || !dateEl) return;
+
+    dateEl.textContent = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+    const { d, m, y } = plinkState.selectedDay;
+    const rng   = seededRand(y * 100000 + m * 1000 + d * 10 + 7);
+    const slots = ALL_SLOTS.filter(() => rng() > 0.35);
+
+    scroll.innerHTML = '';
+    slots.forEach(slot => {
+      const chip = document.createElement('button');
+      chip.type      = 'button';
+      chip.className = 'plink-time-chip' + (plinkState.selectedTime === slot ? ' selected' : '');
+      chip.textContent = slot;
+      chip.addEventListener('click', () => {
+        plinkState.selectedTime = slot;
+        scroll.querySelectorAll('.plink-time-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+
+        document.getElementById('plink-next-btn')?.classList.add('show');
+
+        const { d: dd, m: mm, y: yy } = plinkState.selectedDay;
+        const selStr = new Date(yy, mm, dd).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const badge = document.getElementById('plink-sel-time-badge');
+        const badgeTxt = document.getElementById('plink-sel-time-text');
+        if (badge) badge.classList.add('show');
+        if (badgeTxt) badgeTxt.textContent = selStr + ' · ' + slot;
+      });
+      scroll.appendChild(chip);
+    });
+
+    pane.classList.add('open');
+  }
+
+  function plinkGoToDetails() {
+    if (!plinkState.selectedTime || !plinkState.selectedDay) return;
+    const { d, m, y } = plinkState.selectedDay;
+    const dateStr = new Date(y, m, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const detDate = document.getElementById('plink-det-date'); if (detDate) detDate.textContent = dateStr;
+    const detTime = document.getElementById('plink-det-time'); if (detTime) detTime.textContent = plinkState.selectedTime;
+
+    const nm = document.getElementById('plink-name'); if (nm) nm.value = '';
+    const em = document.getElementById('plink-email'); if (em) em.value = '';
+    const nt = document.getElementById('plink-notes'); if (nt) nt.value = '';
+    const gi = document.getElementById('plink-guest-input'); if (gi) gi.value = '';
+    plinkState.guestEmails = [];
+    document.querySelectorAll('.plink-guest-tag').forEach(t => t.remove());
+    document.getElementById('plink-guests-box')?.classList.remove('open');
+    const sb = document.getElementById('plink-schedule-btn'); if (sb) sb.disabled = true;
+
+    plinkShowStep('details');
+    setTimeout(() => document.getElementById('plink-name')?.focus(), 260);
+  }
+
+  function plinkValidate() {
+    const name  = (document.getElementById('plink-name')?.value || '').trim();
+    const email = (document.getElementById('plink-email')?.value || '').trim();
+    const ok = name.length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const btn = document.getElementById('plink-schedule-btn');
+    if (btn) btn.disabled = !ok;
+  }
+
+  function plinkAddGuest(raw) {
+    const email = raw.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    if (plinkState.guestEmails.includes(email)) return;
+    plinkState.guestEmails.push(email);
+
+    const wrap  = document.getElementById('plink-guest-tags-wrap');
+    const input = document.getElementById('plink-guest-input');
+    if (!wrap || !input) return;
+
+    const tag = document.createElement('div');
+    tag.className = 'plink-guest-tag';
+    tag.innerHTML = `<span>${esc(email)}</span>
+      <button type="button" aria-label="Remove ${esc(email)}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>`;
+    tag.querySelector('button').addEventListener('click', () => {
+      plinkState.guestEmails = plinkState.guestEmails.filter(e => e !== email);
+      tag.remove();
+    });
+    wrap.insertBefore(tag, input);
+    input.value = '';
+  }
+
+  function plinkSchedule() {
+    const name  = (document.getElementById('plink-name')?.value  || '').trim();
+    const email = (document.getElementById('plink-email')?.value || '').trim();
+    const notes = (document.getElementById('plink-notes')?.value || '').trim();
+    const { selectedDay, selectedTime, selectedEvent: ev, guestEmails } = plinkState;
+    if (!name || !email || !selectedDay || !selectedTime || !ev) return;
+
+    const dateObj  = new Date(selectedDay.y, selectedDay.m, selectedDay.d);
+    const dateStr  = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const locLabel = LOC_LABELS[ev.location] || 'Video call';
+    const dur      = ev.duration === 'Custom' ? `${ev.customDuration || 30} min` : ev.duration;
+
+    const cEmail    = document.getElementById('plink-confirm-email');    if (cEmail)    cEmail.textContent    = email;
+    const cEvent    = document.getElementById('plink-confirm-event');    if (cEvent)    cEvent.textContent    = ev.name;
+    const cDatetime = document.getElementById('plink-confirm-datetime'); if (cDatetime) cDatetime.textContent = dateStr + ' · ' + selectedTime + ' (' + dur + ')';
+    const cLoc      = document.getElementById('plink-confirm-loc');      if (cLoc)      cLoc.textContent      = locLabel;
+
+    const evs   = getEvents();
+    const evIdx = evs.findIndex(e => e.id === ev.id);
+    if (evIdx !== -1) {
+      evs[evIdx].hasBooking = true;
+      evs[evIdx].booking    = { name, email, guestEmails: guestEmails.join(', '), notes, dateStr, time: selectedTime };
+      saveEvents(evs);
+    }
+
+    pushActivity({ type: 'created', text: `Booked <strong>${esc(ev.name)}</strong> with ${esc(name)} on ${esc(dateStr)} at ${esc(selectedTime)}`, ts: Date.now() });
+    renderActivity();
+    renderHomeSchedule();
+    renderHomeStats();
+
+    plinkShowStep('success');
+  }
+
+  function initPublicLinkPage() {
+    document.getElementById('plink-close-btn')?.addEventListener('click', closePublicLinkPage);
+    document.getElementById('plink-close-btn')?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closePublicLinkPage(); } });
+
+    document.getElementById('plink-dt-back-btn')?.addEventListener('click', () => { plinkShowStep('profile'); plinkRenderProfile(); if (window.lucide) lucide.createIcons(); });
+    document.getElementById('plink-det-back-btn')?.addEventListener('click', () => { plinkShowStep('datetime'); });
+
+    document.getElementById('plink-prev-month')?.addEventListener('click', () => {
+      plinkState.selectedDay = null; plinkState.selectedTime = null;
+      document.getElementById('plink-times-pane')?.classList.remove('open');
+      document.getElementById('plink-next-btn')?.classList.remove('show');
+      document.getElementById('plink-sel-time-badge')?.classList.remove('show');
+      if (plinkState.month === 0) { plinkState.month = 11; plinkState.year--; } else plinkState.month--;
+      plinkRenderCalendar();
+    });
+    document.getElementById('plink-next-month')?.addEventListener('click', () => {
+      plinkState.selectedDay = null; plinkState.selectedTime = null;
+      document.getElementById('plink-times-pane')?.classList.remove('open');
+      document.getElementById('plink-next-btn')?.classList.remove('show');
+      document.getElementById('plink-sel-time-badge')?.classList.remove('show');
+      if (plinkState.month === 11) { plinkState.month = 0; plinkState.year++; } else plinkState.month++;
+      plinkRenderCalendar();
+    });
+
+    document.getElementById('plink-next-btn')?.addEventListener('click', plinkGoToDetails);
+
+    ['plink-name', 'plink-email'].forEach(id => document.getElementById(id)?.addEventListener('input', plinkValidate));
+    document.getElementById('plink-schedule-btn')?.addEventListener('click', plinkSchedule);
+    document.getElementById('plink-done-btn')?.addEventListener('click', closePublicLinkPage);
+
+    document.getElementById('plink-guests-btn')?.addEventListener('click', () => {
+      document.getElementById('plink-guests-box')?.classList.toggle('open');
+      document.getElementById('plink-guest-input')?.focus();
+    });
+
+    document.getElementById('plink-guest-input')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); plinkAddGuest(e.target.value); }
+    });
+    document.getElementById('plink-guest-input')?.addEventListener('blur', e => { if (e.target.value.trim()) plinkAddGuest(e.target.value); });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('plink-overlay')?.classList.contains('open')) closePublicLinkPage();
+    });
+  }
+
 })();
 </script>
+
+<!-- ════ PUBLIC LINK / BOOKING FLOW OVERLAY ════ -->
+<div class="plink-overlay" id="plink-overlay" role="dialog" aria-modal="true" aria-label="Booking page preview">
+
+  <!-- Close / brand badge -->
+  <button class="plink-brand-close" id="plink-close-btn" type="button" title="Close preview">
+    <div class="plk-logo">S</div>
+    <span>Schedsy</span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+
+  <!-- ── STEP 1: PROFILE ── -->
+  <div class="plink-step active" id="plink-step-profile">
+    <!-- Hero -->
+    <div class="plink-profile-hero">
+      <div class="plink-avatar-ring">
+        <div class="plink-avatar-inner">JO</div>
+      </div>
+      <div class="plink-profile-name">Jacob Olayinka</div>
+      <p class="plink-profile-bio">Hi there! I'm excited to connect with you. Whether it's to discuss ideas, collaborate on a project, or explore opportunities — book a time that works for you.</p>
+      <div class="plink-schedsy-attr"><span class="plk-s-badge">S</span> Powered by Schedsy</div>
+    </div>
+    <!-- Events -->
+    <div class="plink-profile-events">
+      <div class="plink-single-meeting-card" id="plink-single-meeting-card">
+        <div class="plink-smc-title">60Mins Meeting</div>
+        <div class="plink-smc-greeting">Hi there! 👋</div>
+        <p class="plink-smc-desc">I'm looking forward to connecting with you! Whether it's about Snaarp, cybersecurity, business growth, or collaboration opportunities, I'm excited to discuss how we can create something impactful together.</p>
+        <p class="plink-smc-sign">See you soon!<br>— Victor Ariyibi Oke</p>
+        <button class="plink-smc-book-btn" id="plink-smc-book-btn" type="button">Book a Meeting</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: DATE & TIME ── -->
+  <div class="plink-step" id="plink-step-datetime">
+    <div class="plink-topnav">
+      <button class="plink-back-btn" id="plink-dt-back-btn" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+    </div>
+    <div class="plink-dt-wrap">
+
+      <!-- Left panel -->
+      <div class="plink-dt-left">
+        <div class="plink-dt-host-row">
+          <div class="plink-dt-avatar" id="plink-dt-avatar">JO</div>
+          <div class="plink-dt-host-name" id="plink-dt-host-name">Jacob Olayinka</div>
+        </div>
+        <div class="plink-dt-ev-name" id="plink-dt-ev-name">Meeting</div>
+        <div class="plink-dt-meta">
+          <div class="plink-dt-meta-row">
+            <div class="plink-dt-meta-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <span id="plink-dt-dur">30 min</span>
+          </div>
+          <div class="plink-dt-meta-row">
+            <div class="plink-dt-meta-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+            <span id="plink-dt-loc">Video call</span>
+          </div>
+        </div>
+        <div class="plink-dt-divider"></div>
+        <div class="plink-dt-desc" id="plink-dt-desc"></div>
+        <div class="plink-sel-time-badge" id="plink-sel-time-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="plink-sel-time-text">—</span>
+        </div>
+      </div>
+
+      <!-- Right: calendar + times -->
+      <div class="plink-dt-right">
+        <div class="plink-dt-right-hdr">
+          <div class="plink-dt-right-title">Select a Date &amp; Time</div>
+          <div class="plink-dt-right-sub" id="plink-dt-right-sub">All times in your local timezone</div>
+        </div>
+        <div class="plink-dt-right-body">
+          <div class="plink-cal-pane">
+            <div class="plink-month-nav">
+              <button class="plink-nav-btn" id="plink-prev-month" type="button" aria-label="Previous month">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <span class="plink-month-label" id="plink-month-label">June 2026</span>
+              <button class="plink-nav-btn" id="plink-next-month" type="button" aria-label="Next month">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+            <div class="plink-cal-grid" id="plink-cal-grid"></div>
+          </div>
+          <div class="plink-times-pane" id="plink-times-pane">
+            <div class="plink-times-inner">
+              <div class="plink-times-hdr">
+                <div class="plink-times-date" id="plink-times-date">—</div>
+              </div>
+              <div class="plink-times-scroll" id="plink-times-scroll"></div>
+            </div>
+          </div>
+        </div>
+        <div class="plink-dt-footer">
+          <div class="plink-tz-note">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span id="plink-tz-label">Local time</span>
+          </div>
+          <button class="plink-next-btn" id="plink-next-btn" type="button">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 3: DETAILS FORM ── -->
+  <div class="plink-step" id="plink-step-details">
+    <div class="plink-topnav">
+      <button class="plink-back-btn" id="plink-det-back-btn" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+    </div>
+    <div class="plink-det-wrap">
+
+      <!-- Left panel -->
+      <div class="plink-det-left">
+        <div class="plink-dt-host-row">
+          <div class="plink-dt-avatar" id="plink-det-avatar">JO</div>
+          <div class="plink-dt-host-name" id="plink-det-host-name">Jacob Olayinka</div>
+        </div>
+        <div class="plink-dt-ev-name" id="plink-det-ev-name">Meeting</div>
+        <div class="plink-dt-meta">
+          <div class="plink-dt-meta-row">
+            <div class="plink-dt-meta-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <span id="plink-det-dur">30 min</span>
+          </div>
+          <div class="plink-dt-meta-row">
+            <div class="plink-dt-meta-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+            <span id="plink-det-loc">Video call</span>
+          </div>
+        </div>
+        <div class="plink-sel-card">
+          <div class="plink-sel-card-label">Your selection</div>
+          <div class="plink-sel-card-row">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="plink-det-date">—</span>
+          </div>
+          <div class="plink-sel-card-row">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="plink-det-time">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: form -->
+      <div class="plink-det-right">
+        <div class="plink-det-hdr">
+          <div class="plink-det-title">Enter Your Details</div>
+          <div class="plink-det-subtitle">We'll send you a confirmation with all the meeting details.</div>
+        </div>
+        <div class="plink-det-body">
+          <div class="plink-det-field">
+            <label class="plink-det-label" for="plink-name">Name <span class="req">*</span></label>
+            <input class="plink-det-input" type="text" id="plink-name" placeholder="Your full name" autocomplete="name">
+          </div>
+          <div class="plink-det-field">
+            <label class="plink-det-label" for="plink-email">Email <span class="req">*</span></label>
+            <input class="plink-det-input" type="email" id="plink-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+
+          <button class="plink-guests-btn" id="plink-guests-btn" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            Add guests
+          </button>
+          <div class="plink-guests-box" id="plink-guests-box">
+            <div class="plink-guest-tags-wrap" id="plink-guest-tags-wrap">
+              <input class="plink-guest-input" id="plink-guest-input" type="email" placeholder="guest@example.com — press Enter to add">
+            </div>
+          </div>
+
+          <div class="plink-det-field">
+            <label class="plink-det-label" for="plink-notes">
+              Notes <span style="font-weight:400;color:var(--color-text-tertiary)">(optional)</span>
+            </label>
+            <textarea class="plink-det-textarea" id="plink-notes" placeholder="Anything you'd like to share before our meeting…"></textarea>
+          </div>
+        </div>
+        <div class="plink-det-footer">
+          <button class="plink-schedule-btn" id="plink-schedule-btn" type="button" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Schedule Meeting
+          </button>
+          <p class="plink-disclaimer">By scheduling, you confirm this is a genuine meeting request.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 4: SUCCESS ── -->
+  <div class="plink-step" id="plink-step-success">
+    <div class="plink-success-inner">
+      <div class="plink-success-ring">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="plink-success-title">You're booked!</div>
+      <p class="plink-success-body">
+        A confirmation has been sent to <strong id="plink-confirm-email">you</strong>. Looking forward to connecting!
+      </p>
+      <div class="plink-success-card">
+        <div class="plink-success-card-hdr">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+          <div class="plink-success-card-hdr-label">Meeting confirmed</div>
+        </div>
+        <div class="plink-success-card-body">
+          <div class="plink-success-row">
+            <div class="plink-success-row-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="plink-success-row-body">
+              <div class="plink-success-row-lbl">Event</div>
+              <div class="plink-success-row-val" id="plink-confirm-event">—</div>
+            </div>
+          </div>
+          <div class="plink-success-row">
+            <div class="plink-success-row-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="plink-success-row-body">
+              <div class="plink-success-row-lbl">Date &amp; Time</div>
+              <div class="plink-success-row-val" id="plink-confirm-datetime">—</div>
+            </div>
+          </div>
+          <div class="plink-success-row">
+            <div class="plink-success-row-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+            <div class="plink-success-row-body">
+              <div class="plink-success-row-lbl">Location</div>
+              <div class="plink-success-row-val" id="plink-confirm-loc">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="plink-done-btn" id="plink-done-btn" type="button">Close</button>
+    </div>
+  </div>
+
+</div>
 </body>
 </html>
