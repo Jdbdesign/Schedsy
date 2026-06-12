@@ -1006,6 +1006,16 @@
     }
     .review-row-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
 
+    .review-reminder-chip {
+      font-size: 11.5px; font-weight: 600;
+      padding: 3px 9px; border-radius: var(--radius-full);
+      background: var(--color-accent-primary-light);
+      color: var(--color-accent-primary);
+    }
+    .review-reminder-none {
+      font-size: 13.5px; color: var(--color-text-tertiary); font-style: italic;
+    }
+
     .review-link-row {
       padding: 10px var(--space-4);
       background: var(--color-bg-surface);
@@ -2426,18 +2436,29 @@
     .cal-detail-overlay.open .cal-detail-scrim { opacity: 1; }
 
     .cal-detail-wrap {
-      position: absolute; top: 0; right: 0; bottom: 0;
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-6);
     }
 
     .cal-detail-panel {
-      width: 420px; min-width: 420px; height: 100%;
+      width: 100%; max-width: 440px;
+      max-height: calc(100vh - 80px);
       background: var(--color-bg-surface);
+      border-radius: var(--radius-xl);
       display: flex; flex-direction: column;
-      box-shadow: -12px 0 48px rgba(26,25,22,0.11), -1px 0 0 var(--color-border);
-      transform: translateX(100%);
-      transition: transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 40px rgba(26,25,22,0.18), 0 2px 12px rgba(26,25,22,0.08);
+      transform: scale(0.95) translateY(14px);
+      opacity: 0;
+      transition: transform var(--duration-slow) cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity var(--duration-base) var(--ease-out);
+      overflow: hidden;
+      position: relative; z-index: 1;
     }
-    .cal-detail-overlay.open .cal-detail-panel { transform: translateX(0); }
+    .cal-detail-overlay.open .cal-detail-panel {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
 
     .cdp-accent-strip { height: 5px; flex-shrink: 0; }
 
@@ -2458,9 +2479,24 @@
     .cdp-badge.schedsy { background: var(--color-accent-primary-light); color: var(--color-accent-primary); }
     .cdp-badge.google   { background: #EFF4FF; color: #2563EB; }
 
+    .cdp-header-actions {
+      display: flex; align-items: center; gap: 2px;
+    }
+    .cdp-action-btn {
+      width: 32px; height: 32px;
+      background: none; border: none;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--color-text-secondary);
+      transition: background var(--duration-fast), color var(--duration-fast);
+    }
+    .cdp-action-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); }
+    .cdp-action-btn.danger:hover { background: #FEF2F2; color: var(--color-accent-danger); }
+    .cdp-action-btn svg { width: 16px; height: 16px; stroke-width: 1.75; }
+    /* keep .cdp-close alias for any legacy references */
     .cdp-close {
       width: 32px; height: 32px;
-      background: var(--color-bg-subtle); border: none;
+      background: none; border: none;
       border-radius: var(--radius-md);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; color: var(--color-text-secondary);
@@ -2571,18 +2607,19 @@
       background: var(--color-bg-surface);
     }
     .cdp-btn {
-      flex: 1; padding: 9px var(--space-3);
+      padding: 9px var(--space-4);
       border: 1.5px solid var(--color-border);
       border-radius: var(--radius-md);
       font-family: var(--font-body);
-      font-size: 12.5px; font-weight: 600; color: var(--color-text-secondary);
+      font-size: 13px; font-weight: 600; color: var(--color-text-secondary);
       background: var(--color-bg-surface); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: all var(--duration-fast); white-space: nowrap;
     }
     .cdp-btn:hover { background: var(--color-bg-hover); color: var(--color-text-primary); border-color: var(--color-border-strong); }
-    .cdp-btn svg { width: 13px; height: 13px; stroke-width: 1.5; }
+    .cdp-btn svg { width: 14px; height: 14px; stroke-width: 1.5; }
     .cdp-btn.primary {
+      flex: 1;
       background: var(--color-accent-primary); color: white;
       border-color: var(--color-accent-primary);
       box-shadow: 0 2px 8px rgba(45,106,79,0.25);
@@ -3534,6 +3571,26 @@
     }
     .plink-smc-book-btn:active { transform:translateY(0); }
 
+    /* Reminder chips */
+    .reminder-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .reminder-chip {
+      padding:8px 16px;
+      border:1.5px solid var(--color-border);
+      border-radius:var(--radius-full);
+      font-size:13px; font-weight:500;
+      color:var(--color-text-secondary);
+      cursor:pointer; user-select:none;
+      transition:border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast), transform var(--duration-fast);
+    }
+    .reminder-chip:hover { border-color:var(--color-border-strong); color:var(--color-text-primary); transform:translateY(-1px); }
+    .reminder-chip.selected {
+      border-color:var(--color-accent-primary);
+      background:var(--color-accent-primary-light);
+      color:var(--color-accent-primary);
+      font-weight:600;
+    }
+    .reminder-chip.selected:hover { transform:translateY(-1px); }
+
     /* ── STEP 2: DATE/TIME ── */
     #plink-step-datetime { flex-direction:column; background:#F8F7F4; }
 
@@ -3912,6 +3969,268 @@
       .plink-overlay, .plink-step { animation:none; }
       .plink-times-pane, .plink-next-btn { transition:none; }
     }
+
+    /* ════════════════════════════════
+       GOOGLE CALENDAR PAGE
+    ════════════════════════════════ */
+    #page-google-calendar { padding:0; height:calc(100vh - var(--topbar-h)); overflow:hidden; }
+    #page-google-calendar.active { display:flex; }
+    .gcal-wrap { display:flex; width:100%; height:100%; }
+
+    /* ── Left sidebar ── */
+    .gcal-left {
+      width:230px; min-width:230px; border-right:1px solid var(--color-border);
+      padding:12px 8px 16px; overflow-y:auto; display:flex; flex-direction:column; gap:18px;
+      background:var(--color-bg);
+    }
+
+    /* Mini calendar */
+    .gcal-mini-hdr {
+      display:flex; align-items:center; justify-content:space-between; padding:0 6px; margin-bottom:4px;
+    }
+    .gcal-mini-month-label { font-size:12.5px; font-weight:600; color:var(--color-text-primary); }
+    .gcal-mini-nav {
+      background:none; border:none; cursor:pointer; padding:0;
+      width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      color:var(--color-text-tertiary); transition:background var(--duration-fast),color var(--duration-fast);
+    }
+    .gcal-mini-nav:hover { background:var(--color-bg-hover); color:var(--color-text-primary); }
+    .gcal-mini-nav svg { width:14px; height:14px; stroke-width:2; }
+    .gcal-mini-grid-wrap { padding:0 4px; }
+    .gcal-mini-day-hdrs { display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:2px; }
+    .gcal-mini-day-lbl { font-size:10px; font-weight:600; color:var(--color-text-tertiary); text-align:center; padding:2px 0; }
+    .gcal-mini-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+    .gcal-mini-cell {
+      font-size:11.5px; text-align:center; cursor:pointer;
+      width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+      border-radius:50%; margin:1px auto; color:var(--color-text-secondary);
+      transition:background var(--duration-fast),color var(--duration-fast);
+    }
+    .gcal-mini-cell:hover { background:var(--color-bg-hover); color:var(--color-text-primary); }
+    .gcal-mini-cell.gcal-other-month { color:var(--color-border-strong); }
+    .gcal-mini-cell.gcal-today { background:var(--color-accent-primary); color:white; font-weight:700; }
+    .gcal-mini-cell.gcal-cur-month { color:var(--color-text-primary); font-weight:500; }
+
+    /* Calendar section in sidebar */
+    .gcal-cal-section { display:flex; flex-direction:column; gap:1px; }
+    .gcal-cal-section-hdr {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:5px 8px; border-radius:var(--radius-sm); cursor:pointer;
+      font-size:10.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+      color:var(--color-text-tertiary);
+      transition:color var(--duration-fast);
+    }
+    .gcal-cal-section-hdr:hover { color:var(--color-text-primary); }
+    .gcal-cal-section-hdr svg { width:14px; height:14px; stroke-width:2; flex-shrink:0; }
+    .gcal-cal-item {
+      display:flex; align-items:center; gap:10px; padding:5px 8px;
+      border-radius:var(--radius-md); cursor:pointer;
+      font-size:13px; color:var(--color-text-primary);
+      transition:background var(--duration-fast);
+    }
+    .gcal-cal-item:hover { background:var(--color-bg-hover); }
+    .gcal-cal-dot {
+      width:12px; height:12px; border-radius:3px; flex-shrink:0;
+      transition:opacity var(--duration-fast);
+    }
+    .gcal-cal-item.gcal-disabled .gcal-cal-dot { opacity:0.25; }
+    .gcal-cal-item.gcal-disabled { color:var(--color-text-tertiary); }
+
+    /* ── Main right area ── */
+    .gcal-right { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+    /* Toolbar */
+    .gcal-toolbar {
+      display:flex; align-items:center; gap:6px;
+      padding:10px 16px; border-bottom:1px solid var(--color-border); flex-shrink:0;
+    }
+    .gcal-today-btn {
+      padding:6px 14px; border:1px solid var(--color-border); border-radius:6px;
+      font-size:13px; font-weight:500; background:white; color:var(--color-text-primary);
+      cursor:pointer; transition:background var(--duration-fast),border-color var(--duration-fast);
+      font-family:var(--font-body);
+    }
+    .gcal-today-btn:hover { background:var(--color-bg-hover); border-color:var(--color-border-strong); }
+    .gcal-tb-nav {
+      width:30px; height:30px; border:none; background:none; border-radius:50%;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      color:var(--color-text-secondary);
+      transition:background var(--duration-fast),color var(--duration-fast);
+    }
+    .gcal-tb-nav:hover { background:var(--color-bg-hover); color:var(--color-text-primary); }
+    .gcal-tb-nav svg { width:16px; height:16px; stroke-width:2; }
+    .gcal-month-label {
+      font-size:20px; font-weight:400; color:var(--color-text-primary);
+      flex:1; letter-spacing:-0.025em; font-family:var(--font-display);
+    }
+    .gcal-view-tabs {
+      display:flex; border:1px solid var(--color-border); border-radius:6px; overflow:hidden;
+    }
+    .gcal-view-tab {
+      padding:6px 13px; font-size:12.5px; font-weight:500; background:none; border:none;
+      cursor:pointer; color:var(--color-text-secondary); font-family:var(--font-body);
+      transition:background var(--duration-fast),color var(--duration-fast);
+    }
+    .gcal-view-tab:not(:last-child) { border-right:1px solid var(--color-border); }
+    .gcal-view-tab.active { background:var(--color-accent-primary-light); color:var(--color-accent-primary); font-weight:600; }
+    .gcal-view-tab:hover:not(.active) { background:var(--color-bg-hover); color:var(--color-text-primary); }
+
+    /* Grid outer */
+    .gcal-grid-outer { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .gcal-day-hdrs {
+      display:grid; grid-template-columns:repeat(7,1fr);
+      border-bottom:1px solid var(--color-border); flex-shrink:0;
+    }
+    .gcal-day-hdr {
+      text-align:center; padding:7px 0;
+      font-size:10.5px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+      color:var(--color-text-tertiary);
+    }
+    .gcal-grid {
+      display:grid; grid-template-columns:repeat(7,1fr);
+      flex:1; overflow-y:auto;
+      border-left:1px solid var(--color-border);
+    }
+    .gcal-cell {
+      border-right:1px solid var(--color-border);
+      border-bottom:1px solid var(--color-border);
+      min-height:110px; padding:5px 4px 4px; position:relative;
+      overflow:hidden; cursor:pointer;
+      transition:background var(--duration-fast);
+    }
+    .gcal-cell:hover { background:rgba(0,0,0,0.018); }
+    .gcal-cell.gcal-other-month { background:rgba(0,0,0,0.012); }
+    .gcal-cell.gcal-other-month .gcal-cell-num { color:var(--color-text-tertiary); }
+    .gcal-cell-num {
+      font-size:12.5px; font-weight:500; color:var(--color-text-secondary);
+      width:27px; height:27px; display:flex; align-items:center; justify-content:center;
+      border-radius:50%; margin-bottom:3px;
+    }
+    .gcal-cell.gcal-in-month .gcal-cell-num { color:var(--color-text-primary); }
+    .gcal-cell.gcal-today .gcal-cell-num {
+      background:var(--color-accent-primary); color:white; font-weight:700;
+    }
+    .gcal-event-pill {
+      display:flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:500; padding:2px 6px; border-radius:4px;
+      margin-bottom:2px; cursor:pointer; overflow:hidden;
+      white-space:nowrap; text-overflow:ellipsis; max-width:100%;
+    }
+    .gcal-event-pill.gcal-filled { color:white; }
+    .gcal-event-pill.gcal-outline { border:1.5px solid; background:white !important; }
+    .gcal-event-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .gcal-more-lbl { font-size:10.5px; color:var(--color-text-tertiary); padding:1px 4px; font-weight:500; }
+    .gcal-event-pill { cursor:pointer; }
+    .gcal-wv-event  { cursor:pointer; }
+    .gcal-dv-event  { cursor:pointer; }
+
+    /* ════ GCAL EVENT DETAIL POPUP ════ */
+    .gcal-popup-overlay {
+      position: fixed; inset: 0; z-index: 1050;
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gcal-popup-overlay.open { pointer-events: all; }
+    .gcal-popup-scrim {
+      position: absolute; inset: 0;
+      background: rgba(26,25,22,0.28);
+      backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
+      opacity: 0; transition: opacity 200ms ease; cursor: pointer;
+    }
+    .gcal-popup-overlay.open .gcal-popup-scrim { opacity: 1; }
+    .gcal-popup-card {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 380px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transform: scale(0.95) translateY(12px); opacity: 0;
+      transition: transform 280ms cubic-bezier(0.16,1,0.3,1), opacity 180ms ease;
+    }
+    .gcal-popup-overlay.open .gcal-popup-card { transform: scale(1) translateY(0); opacity: 1; }
+    .gcal-popup-actions {
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 10px 12px 0; gap: 2px;
+    }
+    .gcal-popup-action-btn {
+      width: 32px; height: 32px; background: none; border: none;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #5F6368; transition: background 150ms ease;
+    }
+    .gcal-popup-action-btn:hover { background: rgba(0,0,0,0.07); }
+    .gcal-popup-action-btn.danger:hover { background: rgba(220,38,38,0.08); color: #DC2626; }
+    .gcal-popup-action-btn svg { width: 18px; height: 18px; stroke-width: 1.75; }
+    .gcal-popup-title-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 8px 20px 4px;
+    }
+    .gcal-popup-dot {
+      width: 14px; height: 14px; min-width: 14px;
+      border-radius: 50%; margin-top: 5px; flex-shrink: 0;
+    }
+    .gcal-popup-title {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 600; color: #202124; line-height: 1.25;
+    }
+    .gcal-popup-date {
+      font-size: 14px; color: #5F6368;
+      padding: 2px 20px 0 46px; margin-bottom: 12px;
+    }
+    .gcal-popup-divider { height: 1px; background: #E8EAED; margin: 0 0 12px; }
+    .gcal-popup-body { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .gcal-popup-row { display: flex; align-items: flex-start; gap: 16px; }
+    .gcal-popup-row-icon {
+      width: 20px; min-width: 20px; display: flex; align-items: center;
+      justify-content: center; color: #5F6368; padding-top: 1px;
+    }
+    .gcal-popup-row-icon svg { width: 18px; height: 18px; stroke-width: 1.5; }
+    .gcal-popup-row-content { flex: 1; }
+    .gcal-popup-row-primary { font-size: 14px; color: #202124; line-height: 1.4; }
+    .gcal-popup-row-secondary { font-size: 12px; color: #5F6368; margin-top: 2px; line-height: 1.4; }
+
+    /* gcal week view */
+    .gcal-week-view { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .gcal-wv-header { display:grid; grid-template-columns:50px repeat(7,1fr); border-bottom:1px solid var(--color-border); position:sticky; top:0; background:var(--color-bg-surface); z-index:2; flex-shrink:0; }
+    .gcal-wv-time-spacer { border-right:1px solid var(--color-border); }
+    .gcal-wv-day-col-hdr { padding:8px 4px; text-align:center; border-right:1px solid var(--color-border); }
+    .gcal-wv-day-col-hdr:last-child { border-right:none; }
+    .gcal-wv-day-name { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-text-tertiary); }
+    .gcal-wv-day-date { font-size:22px; font-weight:500; color:var(--color-text-secondary); font-family:var(--font-display); line-height:1.1; }
+    .gcal-wv-day-col-hdr.today .gcal-wv-day-date { color:var(--color-accent-primary); }
+    .gcal-wv-day-col-hdr.today .gcal-wv-day-name { color:var(--color-accent-primary); }
+    .gcal-wv-body { display:grid; grid-template-columns:50px repeat(7,1fr); flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--color-border) transparent; }
+    .gcal-wv-time-col { border-right:1px solid var(--color-border); }
+    .gcal-wv-time-lbl { height:48px; display:flex; align-items:flex-start; justify-content:flex-end; padding:4px 6px 0; font-size:10px; font-weight:500; color:var(--color-text-tertiary); border-bottom:1px solid var(--color-border); }
+    .gcal-wv-col { position:relative; border-right:1px solid var(--color-border); }
+    .gcal-wv-col:last-child { border-right:none; }
+    .gcal-wv-col.today-col { background:rgba(45,106,79,0.025); }
+    .gcal-wv-slot { height:48px; border-bottom:1px dashed var(--color-border); }
+    .gcal-wv-event { position:absolute; left:2px; right:2px; border-radius:4px; padding:2px 5px; font-size:10.5px; font-weight:600; color:white; overflow:hidden; cursor:pointer; z-index:1; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    .gcal-wv-event-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .gcal-wv-event-time { font-size:9.5px; opacity:0.85; }
+
+    /* gcal day view */
+    .gcal-day-view { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    .gcal-dv-header { padding:12px 16px; border-bottom:1px solid var(--color-border); background:var(--color-bg-subtle); display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .gcal-dv-date-num { font-family:var(--font-display); font-size:36px; font-weight:300; color:var(--color-text-secondary); line-height:1; }
+    .gcal-dv-date-num.today { width:44px; height:44px; background:var(--color-accent-primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; }
+    .gcal-dv-day-info { display:flex; flex-direction:column; }
+    .gcal-dv-day-name { font-size:14px; font-weight:600; color:var(--color-text-primary); }
+    .gcal-dv-day-sub { font-size:12px; color:var(--color-text-secondary); margin-top:1px; }
+    .gcal-dv-body { display:grid; grid-template-columns:50px 1fr; flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--color-border) transparent; }
+    .gcal-dv-time-col { border-right:1px solid var(--color-border); }
+    .gcal-dv-time-lbl { height:48px; display:flex; align-items:flex-start; justify-content:flex-end; padding:4px 6px 0; font-size:10px; font-weight:500; color:var(--color-text-tertiary); border-bottom:1px solid var(--color-border); }
+    .gcal-dv-col { position:relative; }
+    .gcal-dv-slot { height:48px; border-bottom:1px dashed var(--color-border); }
+    .gcal-dv-event { position:absolute; left:8px; right:8px; border-radius:6px; padding:4px 8px; font-size:12px; font-weight:600; color:white; overflow:hidden; cursor:pointer; z-index:1; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+    .gcal-dv-event-name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .gcal-dv-event-time { font-size:10.5px; opacity:0.85; margin-top:2px; }
+
+    @media(max-width:768px) {
+      .gcal-left { display:none; }
+      .gcal-month-label { font-size:15px; }
+    }
   </style>
 </head>
 <body>
@@ -3960,6 +4279,15 @@
         <a class="nav-item" href="#" data-page="availability" data-label="Availability">
           <span class="nav-icon"><i data-lucide="clock"></i></span>
           <span class="nav-text">Availability</span>
+        </a>
+        <a class="nav-item" href="#" data-page="google-calendar" data-label="Google Calendar">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:18px;height:18px">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              <text x="12" y="19.5" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none" font-family="sans-serif">G</text>
+            </svg>
+          </span>
+          <span class="nav-text">Google Calendar</span>
         </a>
       </div>
 
@@ -4567,6 +4895,127 @@
         </div><!-- /avail-wrapper -->
       </div><!-- /page-availability -->
 
+      <!-- ══ GOOGLE CALENDAR PAGE ══ -->
+      <div class="page-view" id="page-google-calendar">
+        <div class="gcal-wrap">
+
+          <!-- Left sidebar -->
+          <div class="gcal-left">
+
+            <!-- Mini calendar -->
+            <div class="gcal-mini-cal">
+              <div class="gcal-mini-hdr">
+                <span class="gcal-mini-month-label" id="gcal-mini-month-label">Jun 2026</span>
+                <div style="display:flex;gap:2px">
+                  <button class="gcal-mini-nav" id="gcal-mini-prev" type="button" aria-label="Previous month">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                  </button>
+                  <button class="gcal-mini-nav" id="gcal-mini-next" type="button" aria-label="Next month">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="gcal-mini-grid-wrap">
+                <div class="gcal-mini-day-hdrs">
+                  <div class="gcal-mini-day-lbl">S</div>
+                  <div class="gcal-mini-day-lbl">M</div>
+                  <div class="gcal-mini-day-lbl">T</div>
+                  <div class="gcal-mini-day-lbl">W</div>
+                  <div class="gcal-mini-day-lbl">T</div>
+                  <div class="gcal-mini-day-lbl">F</div>
+                  <div class="gcal-mini-day-lbl">S</div>
+                </div>
+                <div class="gcal-mini-grid" id="gcal-mini-grid"></div>
+              </div>
+            </div>
+
+            <!-- My calendars -->
+            <div class="gcal-cal-section">
+              <div class="gcal-cal-section-hdr">
+                My calendars
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              </div>
+              <div class="gcal-cal-item" data-gcal="jacob">
+                <div class="gcal-cal-dot" style="background:#2D6A4F"></div>
+                <span>Jacob Olayinka</span>
+              </div>
+              <div class="gcal-cal-item" data-gcal="birthdays">
+                <div class="gcal-cal-dot" style="background:#0F9D58"></div>
+                <span>Birthdays</span>
+              </div>
+              <div class="gcal-cal-item" data-gcal="schedsy">
+                <div class="gcal-cal-dot" style="background:#4285F4"></div>
+                <span>Schedsy Meetings</span>
+              </div>
+              <div class="gcal-cal-item" data-gcal="reminders">
+                <div class="gcal-cal-dot" style="background:#F4B400"></div>
+                <span>Reminders</span>
+              </div>
+            </div>
+
+            <!-- Other calendars -->
+            <div class="gcal-cal-section">
+              <div class="gcal-cal-section-hdr">
+                Other calendars
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+              </div>
+              <div class="gcal-cal-item" data-gcal="holidays">
+                <div class="gcal-cal-dot" style="background:#DB4437"></div>
+                <span>Holidays in Nigeria</span>
+              </div>
+            </div>
+
+          </div><!-- /gcal-left -->
+
+          <!-- Main area -->
+          <div class="gcal-right">
+
+            <!-- Toolbar -->
+            <div class="gcal-toolbar">
+              <button class="gcal-today-btn" id="gcal-today-btn" type="button">Today</button>
+              <button class="gcal-tb-nav" id="gcal-prev-btn" type="button" aria-label="Previous month">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="gcal-tb-nav" id="gcal-next-btn" type="button" aria-label="Next month">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <span class="gcal-month-label" id="gcal-month-label">June 2026</span>
+              <div class="gcal-view-tabs">
+                <button class="gcal-view-tab active" data-gcview="month" type="button">Month</button>
+                <button class="gcal-view-tab" data-gcview="week" type="button">Week</button>
+                <button class="gcal-view-tab" data-gcview="day" type="button">Day</button>
+              </div>
+            </div>
+
+            <!-- Calendar grid -->
+            <div class="gcal-grid-outer">
+              <div class="gcal-day-hdrs" id="gcal-day-hdrs">
+                <div class="gcal-day-hdr">Sun</div>
+                <div class="gcal-day-hdr">Mon</div>
+                <div class="gcal-day-hdr">Tue</div>
+                <div class="gcal-day-hdr">Wed</div>
+                <div class="gcal-day-hdr">Thu</div>
+                <div class="gcal-day-hdr">Fri</div>
+                <div class="gcal-day-hdr">Sat</div>
+              </div>
+              <div class="gcal-grid" id="gcal-grid"></div>
+              <!-- Week view -->
+              <div class="gcal-week-view" id="gcal-week-view" style="display:none">
+                <div class="gcal-wv-header" id="gcal-wv-header"></div>
+                <div class="gcal-wv-body" id="gcal-wv-body"></div>
+              </div>
+              <!-- Day view -->
+              <div class="gcal-day-view" id="gcal-day-view" style="display:none">
+                <div class="gcal-dv-header" id="gcal-dv-header"></div>
+                <div class="gcal-dv-body" id="gcal-dv-body"></div>
+              </div>
+            </div>
+
+          </div><!-- /gcal-right -->
+
+        </div><!-- /gcal-wrap -->
+      </div><!-- /page-google-calendar -->
+
     </main>
   </div>
 </div>
@@ -4582,6 +5031,7 @@
         <div class="modal-subtitle" id="modal-subtitle">Start with the basics — name, duration, and branding.</div>
         <div class="step-dots" aria-hidden="true">
           <div class="step-dot active"></div>
+          <div class="step-dot"></div>
           <div class="step-dot"></div>
           <div class="step-dot"></div>
         </div>
@@ -4684,8 +5134,28 @@
         </div>
       </div>
 
-      <!-- STEP 3: Review -->
+      <!-- STEP 3: Reminders -->
       <div class="modal-step" data-step="3">
+        <div class="form-field" style="margin-bottom:0">
+          <label class="form-label" style="margin-bottom:6px">When should we remind attendees?</label>
+          <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 var(--space-4);line-height:1.55">Select one or more reminder times. Reminders are sent via email before the meeting starts.</p>
+          <div class="reminder-grid" id="reminder-grid">
+            <div class="reminder-chip" data-reminder="10 min">10 min before</div>
+            <div class="reminder-chip" data-reminder="15 min">15 min before</div>
+            <div class="reminder-chip" data-reminder="30 min">30 min before</div>
+            <div class="reminder-chip" data-reminder="1 hour">1 hour before</div>
+            <div class="reminder-chip" data-reminder="2 hours">2 hours before</div>
+            <div class="reminder-chip" data-reminder="1 day">1 day before</div>
+            <div class="reminder-chip" data-reminder="2 days">2 days before</div>
+          </div>
+          <p class="reminder-none-note" id="reminder-none-note" style="font-size:12px;color:var(--color-text-tertiary);margin-top:14px;line-height:1.5">
+            No reminders selected — attendees won't receive email notifications. You can skip this step.
+          </p>
+        </div>
+      </div>
+
+      <!-- STEP 4: Review -->
+      <div class="modal-step" data-step="4">
         <div class="review-card">
           <div class="review-preview">
             <div class="review-color-dot" id="review-color" style="background:#2D6A4F">
@@ -4708,6 +5178,12 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
               <span id="review-location">—</span>
+            </div>
+            <div class="review-row" id="review-reminders-row">
+              <div class="review-row-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <div id="review-reminders" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">—</div>
             </div>
           </div>
           <div class="review-link-row">
@@ -4734,7 +5210,7 @@
 
     <!-- Footer -->
     <div class="modal-footer" id="modal-footer">
-      <span class="step-counter" id="step-counter">Step 1 of 3</span>
+      <span class="step-counter" id="step-counter">Step 1 of 4</span>
       <div class="btn-row">
         <button class="btn-ghost" id="modal-back" type="button" style="display:none">Back</button>
         <button class="btn-primary" id="modal-next" type="button" disabled>
@@ -5162,9 +5638,17 @@
       <div class="cdp-header">
         <div class="cdp-header-top">
           <span class="cdp-badge schedsy" id="cdp-badge">Schedsy</span>
-          <button class="cdp-close" id="cdp-close-btn" type="button" aria-label="Close event detail">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          </button>
+          <div class="cdp-header-actions">
+            <button class="cdp-action-btn danger" id="cdp-delete-event-btn" type="button" aria-label="Delete meeting">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+            <button class="cdp-action-btn" id="cdp-reschedule-btn" type="button" aria-label="Reschedule meeting">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            </button>
+            <button class="cdp-action-btn" id="cdp-close-btn" type="button" aria-label="Close event detail">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
         </div>
         <div class="cdp-ev-row">
           <div class="cdp-ev-icon" id="cdp-ev-icon">
@@ -5238,14 +5722,6 @@
         <button class="cdp-btn primary" id="cdp-join-btn" type="button">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
           Join Meeting
-        </button>
-        <button class="cdp-btn" id="cdp-reschedule-btn" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-          Reschedule
-        </button>
-        <button class="cdp-btn danger" id="cdp-delete-event-btn" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          Delete Meeting
         </button>
       </div>
 
@@ -5575,6 +6051,10 @@
           switchPage('availability');
           initAvailabilityPage();
           if (window.lucide) lucide.createIcons();
+        } else if (page === 'google-calendar') {
+          switchPage('google-calendar');
+          initGcal();
+          if (window.lucide) lucide.createIcons();
         } else {
           switchPage('home');
           document.querySelectorAll('.nav-item.active').forEach(i => i.classList.remove('active'));
@@ -5705,6 +6185,10 @@
     } else if (page === 'availability') {
       switchPage('availability');
       initAvailabilityPage();
+      if (window.lucide) lucide.createIcons();
+    } else if (page === 'google-calendar') {
+      switchPage('google-calendar');
+      initGcal();
       if (window.lucide) lucide.createIcons();
     } else {
       switchPage('home');
@@ -6780,18 +7264,19 @@
   let etpSearch = '';
 
   let modalStep = 1;
-  const TOTAL_STEPS = 3;
+  const TOTAL_STEPS = 4;
   let formData = {};
 
   const STEP_META = [
     { title: 'New event type',    sub: 'Start with the basics — name, duration, and branding.' },
     { title: 'Meeting location',  sub: 'Where will this meeting take place?' },
+    { title: 'Reminders',         sub: 'Choose when to remind attendees before the meeting.' },
     { title: 'Review & create',   sub: 'Everything look good? You can always edit this later.' },
   ];
 
   function openEventModal() {
     modalStep = 1;
-    formData = { name: '', description: '', duration: '30 min', customDuration: '', color: 'green', location: 'video' };
+    formData = { name: '', description: '', duration: '30 min', customDuration: '', color: 'green', location: 'video', reminders: [] };
 
     /* reset form inputs */
     document.getElementById('ef-name').value = '';
@@ -6804,6 +7289,7 @@
       o.classList.toggle('selected', sel);
       o.setAttribute('aria-checked', String(sel));
     });
+    document.querySelectorAll('.reminder-chip').forEach(c => c.classList.remove('selected'));
 
     /* show form, hide success */
     document.getElementById('modal-form-area').style.display = '';
@@ -6853,7 +7339,8 @@
       nextBtn.innerHTML = `Continue <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`;
     }
 
-    if (modalStep === 3) populateReview();
+    if (modalStep === 4) populateReview();
+    updateReminderNote();
     validateStep();
   }
 
@@ -6873,6 +7360,17 @@
     document.getElementById('review-duration').textContent = dur;
     document.getElementById('review-location').textContent = LOC_LABELS[formData.location] || 'Video call';
     document.getElementById('review-link').textContent     = `schedsy.com/jacob/${slug}`;
+
+    const remindersEl = document.getElementById('review-reminders');
+    if (remindersEl) {
+      if (!formData.reminders || formData.reminders.length === 0) {
+        remindersEl.innerHTML = '<span class="review-reminder-none">No reminders</span>';
+      } else {
+        remindersEl.innerHTML = formData.reminders
+          .map(r => `<span class="review-reminder-chip">${esc(r)} before</span>`)
+          .join('');
+      }
+    }
   }
 
   function submitEvent() {
@@ -6888,6 +7386,7 @@
       customDuration:formData.customDuration,
       color:         formData.color,
       location:      formData.location,
+      reminders:     [...formData.reminders],
       createdAt:     Date.now(),
     };
 
@@ -6979,12 +7478,32 @@
       opt.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); selectLoc(); } });
     });
 
-    /* Step 3 — copy link */
+    /* Step 3 — reminder chips */
+    document.querySelectorAll('.reminder-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        const val = chip.dataset.reminder;
+        if (chip.classList.contains('selected')) {
+          if (!formData.reminders.includes(val)) formData.reminders.push(val);
+        } else {
+          formData.reminders = formData.reminders.filter(r => r !== val);
+        }
+        updateReminderNote();
+      });
+    });
+
+    /* Step 4 — copy link */
     document.getElementById('review-copy-btn').addEventListener('click', () => {
       const link = document.getElementById('review-link').textContent;
       navigator.clipboard.writeText(link).catch(() => {});
       toast('Link copied!', 'success');
     });
+  }
+
+  function updateReminderNote() {
+    const note = document.getElementById('reminder-none-note');
+    if (!note) return;
+    note.style.display = formData.reminders.length === 0 ? '' : 'none';
   }
 
   /* ══════════════════════════════════
@@ -7846,8 +8365,8 @@
       dayBks.slice(0, maxShow).forEach(b => {
         const chip = document.createElement('div');
         chip.className = `cal-event-chip${b.src==='google'?' source-google':''}`;
-        if (b.src!=='google') { chip.style.background=hexRgba(b.color,0.12); chip.style.color=b.color; }
-        chip.innerHTML = `<span class="chip-dot" style="background:${b.color}"></span><span style="overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 14px)">${esc(b.name)}</span>`;
+        if (b.src!=='google') { chip.style.background=b.color; chip.style.color='white'; }
+        chip.innerHTML = `<span class="chip-dot" style="background:rgba(255,255,255,0.4)"></span><span style="overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 14px)">${esc(b.name)}</span>`;
         chip.title = `${b.name}${b.guest?' · '+b.guest:''} · ${calFmt(b.time)}`;
         chip.addEventListener('click', e => { e.stopPropagation(); openCalEventDetail(b); });
         cell.appendChild(chip);
@@ -8833,6 +9352,492 @@
     });
   }
 
+  /* ══════════════════════════════════
+     GOOGLE CALENDAR PAGE
+  ══════════════════════════════════ */
+
+  const GCAL_MONTHS_LONG  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const GCAL_MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  const GCAL_DEMOS = [
+    { name:'Team standup',       off:1,   color:'#4285F4', filled:true,  time:'09:00' },
+    { name:'Project review',     off:3,   color:'#0F9D58', filled:true,  time:'14:00' },
+    { name:'Lunch with Alex',    off:5,   color:'#F4B400', filled:true,  time:'12:30' },
+    { name:'Design sync',        off:7,   color:'#4285F4', filled:true,  time:'10:00' },
+    { name:'Quarterly planning', off:10,  color:'#DB4437', filled:true,  time:'11:00' },
+    { name:'Birthday – Sarah',   off:12,  color:'#0F9D58', filled:true,  time:null   },
+    { name:'Client call',        off:14,  color:'#4285F4', filled:true,  time:'15:30' },
+    { name:'Code review',        off:16,  color:'#0F9D58', filled:false, time:'10:00' },
+    { name:'Sprint planning',    off:18,  color:'#4285F4', filled:true,  time:'09:00' },
+    { name:'Dentist appt.',      off:21,  color:'#DB4437', filled:false, time:'13:00' },
+    { name:'Team offsite',       off:22,  color:'#0F9D58', filled:true,  time:null   },
+    { name:'Team offsite',       off:23,  color:'#0F9D58', filled:true,  time:null   },
+    { name:'Product demo',       off:25,  color:'#4285F4', filled:true,  time:'16:00' },
+    { name:'Retrospective',      off:28,  color:'#7C3AED', filled:true,  time:'14:00' },
+  ];
+
+  const GCAL_DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const GCAL_DAYS_FULL  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  function gcalGetWeekStart(d) {
+    const ws = new Date(d); ws.setDate(d.getDate() - d.getDay()); return ws;
+  }
+
+  let gcalState = {
+    year:      TODAY.getFullYear(),
+    month:     TODAY.getMonth(),
+    miniYear:  TODAY.getFullYear(),
+    miniMonth: TODAY.getMonth(),
+    view:      'month',
+    weekStart: gcalGetWeekStart(TODAY),
+    dayDate:   new Date(TODAY),
+    _init:     false,
+  };
+
+  function initGcal() {
+    if (!gcalState._init) {
+      gcalState._init = true;
+
+      document.getElementById('gcal-today-btn').addEventListener('click', () => {
+        gcalState.year  = TODAY.getFullYear();
+        gcalState.month = TODAY.getMonth();
+        gcalState.miniYear  = gcalState.year;
+        gcalState.miniMonth = gcalState.month;
+        gcalState.weekStart = gcalGetWeekStart(TODAY);
+        gcalState.dayDate   = new Date(TODAY);
+        gcalDoRender();
+      });
+
+      document.getElementById('gcal-prev-btn').addEventListener('click', () => {
+        if (gcalState.view === 'week') {
+          const w = new Date(gcalState.weekStart); w.setDate(w.getDate() - 7); gcalState.weekStart = w;
+        } else if (gcalState.view === 'day') {
+          const d = new Date(gcalState.dayDate); d.setDate(d.getDate() - 1); gcalState.dayDate = d;
+        } else {
+          if (gcalState.month === 0) { gcalState.month = 11; gcalState.year--; }
+          else gcalState.month--;
+          gcalState.miniYear  = gcalState.year;
+          gcalState.miniMonth = gcalState.month;
+        }
+        gcalDoRender();
+      });
+
+      document.getElementById('gcal-next-btn').addEventListener('click', () => {
+        if (gcalState.view === 'week') {
+          const w = new Date(gcalState.weekStart); w.setDate(w.getDate() + 7); gcalState.weekStart = w;
+        } else if (gcalState.view === 'day') {
+          const d = new Date(gcalState.dayDate); d.setDate(d.getDate() + 1); gcalState.dayDate = d;
+        } else {
+          if (gcalState.month === 11) { gcalState.month = 0; gcalState.year++; }
+          else gcalState.month++;
+          gcalState.miniYear  = gcalState.year;
+          gcalState.miniMonth = gcalState.month;
+        }
+        gcalDoRender();
+      });
+
+      document.getElementById('gcal-mini-prev').addEventListener('click', () => {
+        if (gcalState.miniMonth === 0) { gcalState.miniMonth = 11; gcalState.miniYear--; }
+        else gcalState.miniMonth--;
+        gcalRenderMini();
+      });
+
+      document.getElementById('gcal-mini-next').addEventListener('click', () => {
+        if (gcalState.miniMonth === 11) { gcalState.miniMonth = 0; gcalState.miniYear++; }
+        else gcalState.miniMonth++;
+        gcalRenderMini();
+      });
+
+      document.querySelectorAll('.gcal-view-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.gcal-view-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          gcalState.view = tab.dataset.gcview;
+          gcalDoRender();
+        });
+      });
+
+      document.querySelectorAll('.gcal-cal-item').forEach(item => {
+        item.addEventListener('click', () => {
+          item.classList.toggle('gcal-disabled');
+          gcalDoRender();
+        });
+      });
+      initGcalPopup();
+    }
+    gcalDoRender();
+  }
+
+  function gcalDoRender() {
+    const labelEl = document.getElementById('gcal-month-label');
+    if (gcalState.view === 'week') {
+      const ws = gcalState.weekStart;
+      const we = new Date(ws); we.setDate(ws.getDate() + 6);
+      labelEl.textContent = ws.getMonth() === we.getMonth()
+        ? `${GCAL_MONTHS_LONG[ws.getMonth()]} ${ws.getDate()} – ${we.getDate()}, ${ws.getFullYear()}`
+        : `${GCAL_MONTHS_SHORT[ws.getMonth()]} ${ws.getDate()} – ${GCAL_MONTHS_SHORT[we.getMonth()]} ${we.getDate()}, ${ws.getFullYear()}`;
+    } else if (gcalState.view === 'day') {
+      const d = gcalState.dayDate;
+      labelEl.textContent = `${GCAL_DAYS_FULL[d.getDay()]}, ${GCAL_MONTHS_LONG[d.getMonth()]} ${d.getDate()}`;
+    } else {
+      labelEl.textContent = `${GCAL_MONTHS_LONG[gcalState.month]} ${gcalState.year}`;
+    }
+    gcalRenderMini();
+    gcalRenderView();
+  }
+
+  function gcalRenderView() {
+    const monthGrid = document.getElementById('gcal-grid');
+    const monthHdrs = document.getElementById('gcal-day-hdrs');
+    const weekView  = document.getElementById('gcal-week-view');
+    const dayView   = document.getElementById('gcal-day-view');
+    const isMonth = gcalState.view === 'month';
+    const isWeek  = gcalState.view === 'week';
+    if (monthGrid) monthGrid.style.display = isMonth ? '' : 'none';
+    if (monthHdrs) monthHdrs.style.display = isMonth ? '' : 'none';
+    if (weekView)  weekView.style.display  = isWeek  ? 'flex' : 'none';
+    if (dayView)   dayView.style.display   = (!isMonth && !isWeek) ? 'flex' : 'none';
+    if (isMonth)      gcalRenderGrid();
+    else if (isWeek)  gcalRenderWeekView();
+    else              gcalRenderDayView();
+  }
+
+  function gcalRenderWeekView() {
+    const hdr  = document.getElementById('gcal-wv-header');
+    const body = document.getElementById('gcal-wv-body');
+    if (!hdr || !body) return;
+    const SH = 7, EH = 21;
+    const ws = gcalState.weekStart;
+    const events = gcalGetEvents();
+
+    hdr.innerHTML = '<div class="gcal-wv-time-spacer"></div>';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws); d.setDate(d.getDate() + i);
+      const isTod = gcalSameDay(d, TODAY);
+      const col = document.createElement('div');
+      col.className = `gcal-wv-day-col-hdr${isTod ? ' today' : ''}`;
+      col.innerHTML = `<div class="gcal-wv-day-name">${GCAL_DAYS_SHORT[d.getDay()]}</div><div class="gcal-wv-day-date">${d.getDate()}</div>`;
+      hdr.appendChild(col);
+    }
+
+    body.innerHTML = '';
+    const tc = document.createElement('div');
+    tc.className = 'gcal-wv-time-col';
+    for (let h = SH; h < EH; h++) {
+      const lbl = document.createElement('div');
+      lbl.className = 'gcal-wv-time-lbl';
+      lbl.textContent = h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`;
+      tc.appendChild(lbl);
+    }
+    body.appendChild(tc);
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(ws); d.setDate(d.getDate() + i);
+      const isTod = gcalSameDay(d, TODAY);
+      const col = document.createElement('div');
+      col.className = `gcal-wv-col${isTod ? ' today-col' : ''}`;
+      for (let s = 0; s < EH - SH; s++) {
+        const sl = document.createElement('div'); sl.className = 'gcal-wv-slot'; col.appendChild(sl);
+      }
+      events.filter(e => gcalSameDay(e.date, d) && e.time).forEach(ev => {
+        const [h, m] = ev.time.split(':').map(Number);
+        if (h < SH || h >= EH) return;
+        const top = ((h - SH) + m / 60) * 48;
+        const evEl = document.createElement('div');
+        evEl.className = 'gcal-wv-event';
+        evEl.style.cssText = `background:${ev.color};top:${top}px;height:40px`;
+        evEl.innerHTML = `<div class="gcal-wv-event-name">${esc(ev.name)}</div><div class="gcal-wv-event-time">${gcalFmtTime(ev.time)}</div>`;
+        evEl.addEventListener('click', e => { e.stopPropagation(); openGcalPopup(ev); });
+        col.appendChild(evEl);
+      });
+      body.appendChild(col);
+    }
+  }
+
+  function gcalRenderDayView() {
+    const hdr  = document.getElementById('gcal-dv-header');
+    const body = document.getElementById('gcal-dv-body');
+    if (!hdr || !body) return;
+    const d = gcalState.dayDate;
+    const SH = 7, EH = 21;
+    const isTod = gcalSameDay(d, TODAY);
+    const events = gcalGetEvents().filter(e => gcalSameDay(e.date, d) && e.time);
+
+    hdr.innerHTML = `
+      <div class="gcal-dv-date-num${isTod ? ' today' : ''}">${d.getDate()}</div>
+      <div class="gcal-dv-day-info">
+        <div class="gcal-dv-day-name">${GCAL_DAYS_FULL[d.getDay()]}</div>
+        <div class="gcal-dv-day-sub">${GCAL_MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}</div>
+      </div>`;
+
+    body.innerHTML = '';
+    const tc = document.createElement('div');
+    tc.className = 'gcal-dv-time-col';
+    for (let h = SH; h < EH; h++) {
+      const lbl = document.createElement('div');
+      lbl.className = 'gcal-dv-time-lbl';
+      lbl.textContent = h === 12 ? '12 PM' : h > 12 ? `${h - 12} PM` : `${h} AM`;
+      tc.appendChild(lbl);
+    }
+    body.appendChild(tc);
+
+    const col = document.createElement('div');
+    col.className = 'gcal-dv-col';
+    for (let s = 0; s < EH - SH; s++) {
+      const sl = document.createElement('div'); sl.className = 'gcal-dv-slot'; col.appendChild(sl);
+    }
+    events.forEach(ev => {
+      const [h, m] = ev.time.split(':').map(Number);
+      if (h < SH || h >= EH) return;
+      const top = ((h - SH) + m / 60) * 48;
+      const evEl = document.createElement('div');
+      evEl.className = 'gcal-dv-event';
+      evEl.style.cssText = `background:${ev.color};top:${top}px;height:52px`;
+      evEl.innerHTML = `<div class="gcal-dv-event-name">${esc(ev.name)}</div><div class="gcal-dv-event-time">${gcalFmtTime(ev.time)}</div>`;
+      evEl.addEventListener('click', e => { e.stopPropagation(); openGcalPopup(ev); });
+      col.appendChild(evEl);
+    });
+    body.appendChild(col);
+  }
+
+  function gcalRenderMini() {
+    const y = gcalState.miniYear, m = gcalState.miniMonth;
+    document.getElementById('gcal-mini-month-label').textContent =
+      `${GCAL_MONTHS_SHORT[m]} ${y}`;
+
+    const grid  = document.getElementById('gcal-mini-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const firstDay       = new Date(y, m, 1).getDay();
+    const daysInMonth    = new Date(y, m + 1, 0).getDate();
+    const daysInPrevMon  = new Date(y, m, 0).getDate();
+
+    for (let i = 0; i < 42; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'gcal-mini-cell';
+
+      let day, cellDate;
+      if (i < firstDay) {
+        day = daysInPrevMon - firstDay + 1 + i;
+        cellDate = new Date(y, m - 1, day);
+        cell.classList.add('gcal-other-month');
+      } else if (i - firstDay < daysInMonth) {
+        day = i - firstDay + 1;
+        cellDate = new Date(y, m, day);
+        cell.classList.add('gcal-cur-month');
+      } else {
+        day = i - firstDay - daysInMonth + 1;
+        cellDate = new Date(y, m + 1, day);
+        cell.classList.add('gcal-other-month');
+      }
+      cell.textContent = day;
+
+      if (gcalSameDay(cellDate, TODAY)) cell.classList.add('gcal-today');
+
+      cell.addEventListener('click', () => {
+        gcalState.year  = cellDate.getFullYear();
+        gcalState.month = cellDate.getMonth();
+        gcalState.miniYear  = gcalState.year;
+        gcalState.miniMonth = gcalState.month;
+        gcalDoRender();
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function gcalGetEvents() {
+    const evs = [];
+    calGetBookings().forEach(b => {
+      evs.push({
+        name:   b.name + (b.guest ? ' · ' + b.guest : ''),
+        date:   b.date,
+        color:  (EVENT_COLORS.find(c => c.id === b.color) || {}).hex || b.color || '#2D6A4F',
+        filled: true,
+        time:   b.time,
+      });
+    });
+    GCAL_DEMOS.forEach(d => {
+      const date = new Date(TODAY);
+      date.setDate(date.getDate() + d.off);
+      evs.push({ ...d, date });
+    });
+    return evs;
+  }
+
+  function gcalRenderGrid() {
+    const grid = document.getElementById('gcal-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const y = gcalState.year, m = gcalState.month;
+    const firstDay    = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const daysInPrev  = new Date(y, m, 0).getDate();
+    const totalCells  = firstDay + daysInMonth > 35 ? 42 : 35;
+
+    /* Build event map */
+    const evMap = {};
+    gcalGetEvents().forEach(ev => {
+      const k = gcalDk(ev.date);
+      if (!evMap[k]) evMap[k] = [];
+      evMap[k].push(ev);
+    });
+
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'gcal-cell';
+
+      let day, cellDate, inMonth = false;
+      if (i < firstDay) {
+        day = daysInPrev - firstDay + 1 + i;
+        cellDate = new Date(y, m - 1, day);
+        cell.classList.add('gcal-other-month');
+      } else if (i - firstDay < daysInMonth) {
+        day = i - firstDay + 1;
+        cellDate = new Date(y, m, day);
+        inMonth = true;
+        cell.classList.add('gcal-in-month');
+      } else {
+        day = i - firstDay - daysInMonth + 1;
+        cellDate = new Date(y, m + 1, day);
+        cell.classList.add('gcal-other-month');
+      }
+
+      if (gcalSameDay(cellDate, TODAY)) cell.classList.add('gcal-today');
+
+      /* Day number */
+      const num = document.createElement('div');
+      num.className = 'gcal-cell-num';
+      num.textContent = day;
+      cell.appendChild(num);
+
+      /* Events */
+      const dayEvs = evMap[gcalDk(cellDate)] || [];
+      const visible = dayEvs.slice(0, 3);
+      visible.forEach(ev => {
+        const pill = document.createElement('div');
+        pill.className = 'gcal-event-pill ' + (ev.filled ? 'gcal-filled' : 'gcal-outline');
+        if (ev.filled) { pill.style.background = ev.color; pill.style.color = 'white'; }
+        else { pill.style.borderColor = ev.color; pill.style.color = ev.color; }
+        const timeStr = ev.time ? gcalFmtTime(ev.time) + ' ' : '';
+        pill.textContent = timeStr + ev.name;
+        pill.title = pill.textContent;
+        pill.addEventListener('click', e => { e.stopPropagation(); openGcalPopup({ ...ev, date: cellDate }); });
+        cell.appendChild(pill);
+      });
+      if (dayEvs.length > 3) {
+        const more = document.createElement('div');
+        more.className = 'gcal-more-lbl';
+        more.textContent = `+${dayEvs.length - 3} more`;
+        cell.appendChild(more);
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function gcalFmtTime(t) {
+    if (!t) return '';
+    const [h, min] = t.split(':').map(Number);
+    const ampm = h >= 12 ? 'pm' : 'am';
+    return `${h % 12 || 12}${min > 0 ? ':' + String(min).padStart(2, '0') : ''}${ampm}`;
+  }
+
+  function gcalSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth()    === b.getMonth()    &&
+           a.getDate()     === b.getDate();
+  }
+
+  function gcalDk(d) { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+  /* ── GCAL EVENT POPUP ── */
+  function openGcalPopup(ev) {
+    const overlay = document.getElementById('gcal-popup-overlay');
+    if (!overlay) return;
+
+    /* Color dot */
+    const dot = document.getElementById('gcal-popup-dot');
+    if (dot) dot.style.background = ev.color || '#4285F4';
+
+    /* Title */
+    const titleEl = document.getElementById('gcal-popup-title');
+    if (titleEl) titleEl.textContent = ev.name || 'Event';
+
+    /* Date */
+    const dateEl = document.getElementById('gcal-popup-date');
+    if (dateEl && ev.date) {
+      const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      dateEl.textContent = ev.date.toLocaleDateString('en-US', opts);
+    }
+
+    /* Time row */
+    const timeRow = document.getElementById('gcal-popup-time-row');
+    const timeEl  = document.getElementById('gcal-popup-time');
+    if (ev.time) {
+      const [h, m] = ev.time.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hh = h % 12 || 12;
+      const mm = m > 0 ? ':' + String(m).padStart(2, '0') : '';
+      if (timeEl) timeEl.textContent = `${hh}${mm} ${ampm}`;
+      if (timeRow) timeRow.style.display = '';
+    } else {
+      if (timeRow) timeRow.style.display = 'none';
+    }
+
+    /* Notes row */
+    const notesRow = document.getElementById('gcal-popup-notes-row');
+    const notesEl  = document.getElementById('gcal-popup-notes');
+    const notesSub = document.getElementById('gcal-popup-notes-sub');
+    if (ev.notes) {
+      if (notesEl) notesEl.textContent = ev.notes;
+      if (notesSub) notesSub.textContent = ev.notesSub || '';
+      if (notesRow) notesRow.style.display = '';
+    } else if (ev.time) {
+      if (notesEl) notesEl.textContent = 'Schedsy Booking';
+      if (notesSub) notesSub.textContent = '';
+      if (notesRow) notesRow.style.display = '';
+    } else {
+      if (notesRow) notesRow.style.display = 'none';
+    }
+
+    /* Calendar label */
+    const calEl = document.getElementById('gcal-popup-calendar');
+    if (calEl) calEl.textContent = ev.calendar || 'Jacob Olayinka';
+
+    /* Visibility */
+    const visEl = document.getElementById('gcal-popup-visibility');
+    if (visEl) visEl.textContent = ev.visibility || 'Public';
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGcalPopup() {
+    const overlay = document.getElementById('gcal-popup-overlay');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function initGcalPopup() {
+    const overlay = document.getElementById('gcal-popup-overlay');
+    if (!overlay || overlay._gcalInit) return;
+    overlay._gcalInit = true;
+    document.getElementById('gcal-popup-close-btn')?.addEventListener('click', closeGcalPopup);
+    document.getElementById('gcal-popup-scrim')?.addEventListener('click', closeGcalPopup);
+    document.getElementById('gcal-popup-delete-btn')?.addEventListener('click', () => {
+      closeGcalPopup(); toast('Delete — coming soon!', 'info');
+    });
+    document.getElementById('gcal-popup-more-btn')?.addEventListener('click', () => {
+      toast('More options — coming soon!', 'info');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeGcalPopup();
+    }, { once: false });
+  }
+
 })();
 </script>
 
@@ -9075,6 +10080,83 @@
     </div>
   </div>
 
+</div>
+
+<!-- ════ GCAL EVENT DETAIL POPUP ════ -->
+<div class="gcal-popup-overlay" id="gcal-popup-overlay" role="dialog" aria-modal="true" aria-labelledby="gcal-popup-title">
+  <div class="gcal-popup-scrim" id="gcal-popup-scrim"></div>
+  <div class="gcal-popup-card">
+
+    <!-- Action buttons -->
+    <div class="gcal-popup-actions">
+      <button class="gcal-popup-action-btn danger" id="gcal-popup-delete-btn" type="button" aria-label="Delete event">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+      <button class="gcal-popup-action-btn" id="gcal-popup-more-btn" type="button" aria-label="More options">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>
+      </button>
+      <button class="gcal-popup-action-btn" id="gcal-popup-close-btn" type="button" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Title row -->
+    <div class="gcal-popup-title-row">
+      <div class="gcal-popup-dot" id="gcal-popup-dot"></div>
+      <div class="gcal-popup-title" id="gcal-popup-title">Event Name</div>
+    </div>
+
+    <!-- Date -->
+    <div class="gcal-popup-date" id="gcal-popup-date">—</div>
+
+    <div class="gcal-popup-divider"></div>
+
+    <!-- Detail rows -->
+    <div class="gcal-popup-body">
+
+      <!-- Time row -->
+      <div class="gcal-popup-row" id="gcal-popup-time-row">
+        <div class="gcal-popup-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="gcal-popup-row-content">
+          <div class="gcal-popup-row-primary" id="gcal-popup-time">—</div>
+        </div>
+      </div>
+
+      <!-- Notes row -->
+      <div class="gcal-popup-row" id="gcal-popup-notes-row">
+        <div class="gcal-popup-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <div class="gcal-popup-row-content">
+          <div class="gcal-popup-row-primary" id="gcal-popup-notes">—</div>
+          <div class="gcal-popup-row-secondary" id="gcal-popup-notes-sub"></div>
+        </div>
+      </div>
+
+      <!-- Calendar source row -->
+      <div class="gcal-popup-row">
+        <div class="gcal-popup-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="gcal-popup-row-content">
+          <div class="gcal-popup-row-primary" id="gcal-popup-calendar">Jacob Olayinka</div>
+        </div>
+      </div>
+
+      <!-- Visibility row -->
+      <div class="gcal-popup-row">
+        <div class="gcal-popup-row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="gcal-popup-row-content">
+          <div class="gcal-popup-row-primary" id="gcal-popup-visibility">Public</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 </body>
 </html>
